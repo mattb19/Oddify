@@ -1,3 +1,5 @@
+/************* TABLE AND MAIN BODY *************/
+
 * {
     margin: 0;
     padding: 0;
@@ -24,7 +26,8 @@
     width: 62vw;  /* 65% of the viewport width */
     height: 60vh; /* 65% of the viewport height */
     transform: translate(-50%, -50%);
-    background-color: rgb(18, 46, 22);
+    /* background-color: rgb(18, 46, 22); */
+    background-image: radial-gradient(circle, green 10%, rgb(18, 46, 22) 100%);
     border-radius: 500px; /* Aggressive corner rounding */
 }
 
@@ -64,6 +67,11 @@ body, html {
     }
 }
 
+
+
+
+/************* PLAYERS *************/
+
 .playerContainer {
     position: absolute;
     width: 100%;
@@ -83,12 +91,42 @@ body, html {
 }
 
 .profilePicture{
-    width: 120px;
-    border-radius: 15px;
+    width: 100px;
+    border-radius: 50%;
+}
+
+.profilePicContainer{
+    z-index: 100;
+}
+
+.playerTagContainer{
+    position: relative;
+    z-index: 99;
+    width: 1700px;
+    right:106px;
+}
+
+.playerTag{
+    width: 25%;
+    height: 165px;
+}
+
+.playerInfoContainer{
+    position: absolute;
+    z-index: 101;
+    left:6.1%;
+}
+
+.playerChipCount{
+    font-size: 17px;
+}
+
+.playerName{
+    font-size: 22px;
 }
 
 /* Positioning the player slots */
-#player1 { bottom: 15%; left: calc(54%); transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
+#player1 { bottom: 15%; left: calc(70%); transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
 #player2 { bottom: 25%; right: calc(14.5%); transform: translate(-50%, -50%); } /* Moved from 20.5% to 14.5% */
 #player3 { top: 49%; right: calc(10.3%); transform: translate(-50%, -50%); } /* Moved from 16.3% to 10.3% */
 #player4 { top: 25%; right: calc(16.5%); transform: translate(-50%, -50%); } /* Moved from 22.5% to 16.5% */
@@ -98,6 +136,14 @@ body, html {
 #player8 { top: 49%; left: calc(22.3%); transform: translate(-50%, -50%); } /* Moved from 16.3% to 22.3% */
 #player9 { bottom: 25%; left: calc(24.5%); transform: translate(-50%, -50%); } /* Moved from 20.5% to 24.5% */
 
+
+
+
+
+
+
+
+/************* POT AND CURRENT BET INFORMATION *************/
 
 .tableInfoContainer {
     position: fixed; /* Fixed positioning to keep it on top */
@@ -123,6 +169,13 @@ body, html {
     text-align: center; /* Center the text */
 }
 
+
+
+
+
+
+/************* TABLE CARDS *************/
+
 .tableCardsContainer {
     position: fixed; /* Fixed positioning to keep it on top */
     top: 55%;
@@ -141,6 +194,12 @@ body, html {
 #flop3 { bottom: 15%; left: 35%; transform: translate(-50%, -50%);   }
 #turn  { bottom: 15%; left: 35.3%; transform: translate(-50%, -50%); }
 #river { bottom: 15%; left: 35.6%; transform: translate(-50%, -50%); }
+
+
+
+
+
+/************* INTERACTION BUTTONS *************/
 
 .buttonContainer {
     position: fixed; /* Keep it fixed to the viewport */
