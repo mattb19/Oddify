@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poker Table</title>
+    <link rel="stylesheet" href="table.css">
+</head>
+<body>
+    <div class="tableContainer">
+        <div class="circle"></div>
+        <div class="hole"></div>
+        <div class="table"></div>
+        <div class="playerContainer">
+            <div class="playerSlot" id="player1">
+                <img src="../images/general/yuhfar.png" class="profilePicture">
+            </div>
+            <div class="playerSlot" id="player2">
+                <img src="../images/general/yuhfar.png" class="profilePicture">
+            </div>
+            <div class="playerSlot" id="player3">
+                <img src="../images/general/yuhfar.png" class="profilePicture">
+            </div>
+            <div class="playerSlot" id="player4">
+                <img src="../images/general/yuhfar.png" class="profilePicture">
+            </div>
+            <div class="playerSlot" id="player5">
+                <img src="../images/general/yuhfar.png" class="profilePicture">
+            </div>
+            <div class="playerSlot" id="player6">
+                <img src="../images/general/yuhfar.png" class="profilePicture">
+            </div>
+            <div class="playerSlot" id="player7">
+                <img src="../images/general/yuhfar.png" class="profilePicture">
+            </div>
+            <div class="playerSlot" id="player8">
+                <img src="../images/general/yuhfar.png" class="profilePicture">
+            </div>
+            <div class="playerSlot" id="player9">
+                <img src="../images/general/yuhfar.png" class="profilePicture">
+            </div>
+        </div>
+    </div>
+    <div class="tableInfoContainer">
+        <div class="pot" id="potAmount">200</div>
+        <div class="currentBet" id="currentBetAmount">Current Bet: 20</div>
+    </div>
+    <div class="tableCardsContainer">
+        <img src="../images/poker cards/None_of_None.png" class="tableCard" id="flop1">
+        <img src="../images/poker cards/None_of_None.png" class="tableCard" id="flop2">
+        <img src="../images/poker cards/None_of_None.png" class="tableCard" id="flop3">
+        <img src="../images/poker cards/None_of_None.png" class="tableCard" id="turn">
+        <img src="../images/poker cards/None_of_None.png" class="tableCard" id="river">
+    </div>
+    <div class="actionContainer">
+        <div class="buttonContainer">
+            <button class="actionButton" id="activateSlider">BET</button>
+            <button class="actionButton" id="callButton">CALL</button>
+            <button class="actionButton" id="foldButton">FOLD</button>
+            <script src="tableEvents.js"></script>
+        </div>
+        <div class="sliderContainer">
+            <input type="range" min="1" max="100" value="50" id="valueSlider">
+            <button id="betButton">Bet</button>
+        </div>
+    </div>
+</body>
+</html>

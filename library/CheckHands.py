@@ -160,6 +160,7 @@ class CheckHands:
         count_values = {value: card_values.count(value) for value in set(card_values)}
         
         trips = [value for value, count in count_values.items() if count == 3]
+    
         if trips:
             trips_value = trips[0]
             remaining_cards = [value for value in card_values if value != trips_value]

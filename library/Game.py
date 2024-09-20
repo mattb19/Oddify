@@ -287,10 +287,7 @@ class Game:
                 p.setTurn(True)
         
         message = self.proceedToNextStage()
-        if message:
-            return +"\n"+message
-        else:
-            return result
+        return result+"\n"+message if message else result
         
     def proceedToNextStage(self): 
         """
@@ -316,38 +313,27 @@ class Game:
         allinPlayers = [i for i in self.players if i.getAllIn() is True]
         nonFolded = [i for i in self.players if i.getCurrentBet() is not None]
         
-        # If all players are all-in or all but one are all-in and no one has taken action
+        # If all players are all-in or all but one are all-in and it is no ones turn
         if (len(allinPlayers) == len(nonFolded)) or (len(allinPlayers) + 1 == len(nonFolded) and True not in turns):
             while self.round < 4:
-                if self.round == 0:
+                if self.round == 0: #If Pre Flop
                     # Deal the flop (first three community cards)
                     self.flop1 = self.tableCards[0]
                     self.flop2 = self.tableCards[1]
                     self.flop3 = self.tableCards[2]
                     self.round = 1  # Move to the next round
-                    time.sleep(5)  # Delay for UI updates
                     
-                    # Reset current bets for players who are not spectating
-                    for i in self.players:
-                        if not i.getSpectate() and i.getCurrentBet() is not None:
-                            i.setCurrentBetZero()
-                elif self.round == 1:
+                if self.round == 1: # If Flop
                     # Deal the turn (fourth community card)
                     self.turn = self.tableCards[3]
                     self.round += 1
-                    time.sleep(5)
-                    for i in self.players:
-                        if not i.getSpectate() and i.getCurrentBet() is not None:
-                            i.setCurrentBetZero()
-                elif self.round == 2:
+                    
+                if self.round == 2: # If Turn
                     # Deal the river (fifth community card)
                     self.river = self.tableCards[4]
                     self.round += 1
-                    time.sleep(5)
-                    for i in self.players:
-                        if not i.getSpectate() and i.getCurrentBet() is not None:
-                            i.setCurrentBetZero()
-                elif self.round == 3:
+                    
+                if self.round == 3: # If River
                     # End the current round
                     self.round = 4
                     return self.endRound()
@@ -427,8 +413,7 @@ class Game:
                 counter += 1
                 self.currentPlayer = counter  # Update the current player
                 return None
-
-  
+ 
     def endHand(self):
         """
         Ends the current hand by determining the winner(s), distributing the winnings,
@@ -495,7 +480,6 @@ class Game:
 
         # Distribution dictionary to track winnings for each player
         distribution = {i.user: 0 for i in winners_sorted}
-
         # Iterate over each group of players with the same hand worth
         for group in grouped_winners.values():
             # Create a new dictionary to group players by their currentBet
@@ -505,33 +489,33 @@ class Game:
             # Populate the new_dict with players based on their currentBet
             for i in group:
                 new_dict[i.currentBet].append(i)
-            
             # Copy result to a new dictionary for processing
             result_dict = {key: players[:] for key, players in new_dict.items()}
-
             # Combine players with lower currentBet with those of higher currentBet
             for lower_key in sorted(result_dict.keys()):
                 for higher_key in sorted(result_dict.keys()):
                     if higher_key > lower_key:
                         result_dict[lower_key].extend(result_dict[higher_key])
             # This step effectively combines players who have lower bets into the higher bet groups.
-
             # Remove duplicates from result_dict
             result_dict = {key: list(set(players)) for key, players in result_dict.items()}
             # This ensures that each player appears only once in the resulting list.
 
             # Create a new dictionary with differences in currentBet as keys
-            new_dict2 = {}
+            my_dict = {}
             prev_key = None
+            new_dict2 = []
 
             # Populate new_dict2 with the differences between successive keys
+            # <PROBLEM> - This will not work if the difference is already an existing key. it will be overridden
+            # Need to implement the algorithm using lists instead, rewriting the splitting logic
             for key in sorted(result_dict.keys()):
                 # If prev_key is None, use the current key; otherwise, use the difference from prev_key
-                new_dict2[key if prev_key is None else key - prev_key] = result_dict[key]
+                new_dict2.append([key if prev_key is None else key - prev_key, result_dict[key]])
                 prev_key = key
-
+            
             # Distribute winnings based on the calculated groups in new_dict2
-            for key, players in new_dict2.items():
+            for key, players in new_dict2:
                 split = len(players)  # Number of players in this group
                 take = key // split   # Calculate the amount each player will take
 
@@ -553,8 +537,7 @@ class Game:
                                 w.currentBet -= take * split  # Deduct the distributed amount from the last player's currentBet
 
         return distribution  # Return the final distribution of winnings
-
-       
+     
     def getGameID(self):
         return self.gameID
     
