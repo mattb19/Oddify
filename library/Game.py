@@ -7,7 +7,7 @@ from itertools import groupby
 
 class Game:
     def __init__(self, gameID, players, smallBlind, bigBlind, deck=None, pot=0, currentBet=0, round=0, currentPlayer=None, tableCards=None, 
-                 lastWinners=None, playerQueue=None, active=False, blinds=None, flip=True, abilities="ON", style="TEXAS HOLD'EM", bombPot=False, 
+                 lastWinners=None, playerQueue=None, active=False, blinds=None, flip=True, bombPot=False, 
                  flop1=None, flop2=None, flop3=None, turn=None, river=None, Time=0) -> None:
         """
         Initializes a new game instance with the provided parameters.
@@ -24,14 +24,10 @@ class Game:
             currentPlayer (Player, optional): The player whose turn it is. Defaults to None.
             tableCards (list of Card, optional): Cards on the table. Defaults to an empty list.
             lastWinners (list of Player, optional): List of last winners. Defaults to an empty list.
-            playerNames (list of str, optional): List of player names. Defaults to an empty list.
-            playerCount (int, optional): Number of players in the game. Defaults to 0.
             playerQueue (list of Player, optional): Queue of players. Defaults to an empty list.
             active (bool, optional): Whether the game is active. Defaults to False.
             blinds (list of int, optional): List of blind amounts. Defaults to an empty list.
             flip (bool, optional): Whether the game involves flipping cards. Defaults to True.
-            abilities (str, optional): Abilities available in the game. Defaults to "ON".
-            style (str, optional): The style of the game (e.g., "TEXAS HOLD'EM"). Defaults to "TEXAS HOLD'EM".
             bombPot (bool, optional): Whether the game has a bomb pot feature. Defaults to False.
             flop1 (Card, optional): The first flop card. Defaults to a Card with no suit, number, or value.
             flop2 (Card, optional): The second flop card. Defaults to a Card with no suit, number, or value.
@@ -49,14 +45,10 @@ class Game:
         self.currentPlayer = currentPlayer
         self.tableCards = tableCards if tableCards is not None else []
         self.lastWinners = lastWinners if lastWinners is not None else []
-        self.playerNames = [i.getUser().strip(' ') for i in self.players]
-        self.playerCount = len(self.players)
         self.playerQueue = playerQueue if playerQueue is not None else []
         self.active = active
         self.blinds = blinds if blinds is not None else []
         self.flip = flip
-        self.abilities = abilities
-        self.style = style
         
         self.bombPot = bombPot
         
@@ -111,21 +103,17 @@ class Game:
         Initializes a new round of the game by resetting necessary attributes, dealing new cards,
         and updating blinds and bets. Handles player status, table cards, and sets up for a new betting round.
         """
-        print("============= Initializing New Round =============")
         # Reset player hand worth and deal a new shuffled deck
-        print("- Shuffling the deck and adding new players")
         self.shuffleDeck()
         self.players = [player for player in self.players if not player.getSpectate()] + self.playerQueue
         self.playerQueue = []
 
-        print("- Resetting game status")
         # Reset round and game status
         self.round = 0
         self.pot = 0
         self.lastWinners = []
         self.tableCards = []
 
-        print("- Rotating blinds")
         # Set player hands worth to 0
         for player in self.players:
             player.setHandWorthZero()
@@ -139,7 +127,6 @@ class Game:
         else:
             self.rotateBlinds()
 
-        print("- Resetting player status'")
         # Set player turn and reset their bets
         for player in self.players:
             if player.getSpectate():
@@ -149,7 +136,6 @@ class Game:
                 player.setTurn(True)
                 player.setAllIn(False)
 
-        print("- Updating pot")
         # Set blinds and update pot
         for player in self.players:
             if player.getSpectate():
@@ -167,7 +153,6 @@ class Game:
 
         self.currentBet = self.bigBlind
 
-        print("- Dealing cards")
         # Set table cards to face down
         self.flop1 = self.flop2 = self.flop3 = self.turn = self.river = Card("None", "None", 0)
 
@@ -179,8 +164,6 @@ class Game:
 
         # Set current player to the one after the big blind
         self.setCurrentPlayer()
-                    
-        print("============= PRE FLOP =============")
 
     def rotateBlinds(self):
         """
@@ -226,6 +209,9 @@ class Game:
         """
         if self.round == 4 or not self.active:
             result = "Error: Invalid Bet Time"
+            
+        if value == -1:
+            return "Nothing was done"
 
         # Get the current player
         player = self.players[self.currentPlayer]
@@ -234,12 +220,12 @@ class Game:
             # Player folds
             player.setFolded()
             player.setTurn(False)
-            print(f"{player.getUser()} Folds.")
+            result = f"{player.user} Folds!"
             
         elif value == 0 and player.getCurrentBet() == self.currentBet:
             # Player checks
             player.setTurn(False)
-            print(f"{player.getUser()} Checks.")
+            result = f"{player.user} Checks!"
         
         elif value == self.currentBet and value < player.getChipCount():
             # Player calls
@@ -248,7 +234,7 @@ class Game:
             player.setTurn(False)
             self.pot += value - player.getCurrentBet()
             player.setCurrentBet(self.currentBet)
-            print(f"{player.getUser()} Calls {value}! {player.getUser()}'s current bet is {player.currentBet}. Pot is {self.pot}")
+            result = f"{player.user} calls {value}! Pot is now {self.pot}!"
         
         elif value > self.currentBet and value < player.getChipCount():
             # Player raises
@@ -258,7 +244,7 @@ class Game:
             self.currentBet = value
             self.pot += value - player.getCurrentBet()
             player.setCurrentBet(self.currentBet)
-            print(f"{player.getUser()} Raises to {value}! {player.getUser()}'s current bet is {player.currentBet}. Pot is {self.pot}")
+            result = f"{player.user} raises {value}! Pot is now {self.pot}!"
         
         elif value - player.getCurrentBet() == player.getChipCount():
             # Player goes all-in
@@ -269,15 +255,15 @@ class Game:
             self.currentBet = max(self.currentBet, value)
             player.setAllIn(True)
             player.setCurrentBet(value)
-            print(f"{player.getUser()} IS ALL IN!")
+            result = f"{player.user} is ALL-IN for {value}! Pot is now {self.pot}!"
             
         elif value + player.getCurrentBet() < self.currentBet:
             # Not enough to call or raise
-            result = "You must put more in to call or raise"
+            raise ValueError("You must put more in to call or raise")
         
         elif value > player.getChipCount():
             # Insufficient funds
-            result = "Insufficient Funds"
+            raise ValueError("Insufficient Funds")
         
         # Set turns for remaining players
         for p in self.players:
@@ -384,13 +370,10 @@ class Game:
             # Output the stage of the game
             if self.round == 1:
                 result = "============= FLOP ============="
-                print("============= FLOP =============")
             elif self.round == 2:
                 result = "============= TURN ============="
-                print("============= TURN =============")
             elif self.round == 3:
                 result = "============= RIVER ============="
-                print("============= RIVER =============")
 
             # Reset current bets for players who are not all-in or spectating
             for i in self.players:
@@ -420,11 +403,9 @@ class Game:
         Ends the current hand by determining the winner(s), distributing the winnings,
         and resetting player statuses and game state for the next hand.
         """
-        print("============= END OF ROUND =============")
         # Initialize hand evaluator
         check = CheckHands()
         
-        print("- Evaluating hands")
         # Evaluate each player's hand
         for player in self.players:
             cards = [self.tableCards[0], self.tableCards[1], self.tableCards[2], 
@@ -443,7 +424,6 @@ class Game:
                     player.setHandWorth(worth)
                     break
         
-        print("- Distributing winnings")
         winnings = self.split_pot(self.players)
         
         for name, take in winnings.items():
@@ -575,14 +555,8 @@ class Game:
     def setFlop1(self, card):
         self.flop1 = card
     
-    def getAbilities(self):
-        return self.abilities
-    
     def getBlinds(self):
         return str(self.bigBlind)+"/"+str(self.smallBlind)
-    
-    def getStyle(self):
-        return self.style
     
     def setTime(self, Time):
         self.Time = Time
@@ -671,7 +645,6 @@ class Game:
             return json.loads(json.dumps(game, default=lambda o: o.__dict__))
         
         except TypeError as e:
-            print(f"Serialization error: {e}")
             return None
 
     def reset(self, big, small, *players):

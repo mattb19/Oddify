@@ -1,0 +1,379 @@
+{
+    "gameID": 0,
+    "players": [
+        {
+            "user": "Matt",
+            "card1": {
+                "_suit": "Hearts",
+                "_num": "King",
+                "_value": 13
+            },
+            "card2": {
+                "_suit": "Clubs",
+                "_num": "5",
+                "_value": 5
+            },
+            "chipCount": 990,
+            "blind": 1,
+            "currentBet": 10,
+            "handWorth": 0,
+            "turn": true,
+            "allIn": false,
+            "spectate": false,
+            "muck": false,
+            "totalValue": 10
+        },
+        {
+            "user": "Jeremy",
+            "card1": {
+                "_suit": "Clubs",
+                "_num": "2",
+                "_value": 2
+            },
+            "card2": {
+                "_suit": "Spades",
+                "_num": "2",
+                "_value": 2
+            },
+            "chipCount": 980,
+            "blind": 2,
+            "currentBet": 20,
+            "handWorth": 0,
+            "turn": true,
+            "allIn": false,
+            "spectate": false,
+            "muck": false,
+            "totalValue": 20
+        },
+        {
+            "user": "Ryan",
+            "card1": {
+                "_suit": "Diamonds",
+                "_num": "6",
+                "_value": 6
+            },
+            "card2": {
+                "_suit": "Clubs",
+                "_num": "6",
+                "_value": 6
+            },
+            "chipCount": 1000,
+            "blind": 0,
+            "currentBet": 0,
+            "handWorth": 0,
+            "turn": true,
+            "allIn": false,
+            "spectate": false,
+            "muck": false,
+            "totalValue": 0
+        },
+        {
+            "user": "Jackson",
+            "card1": {
+                "_suit": "Diamonds",
+                "_num": "7",
+                "_value": 7
+            },
+            "card2": {
+                "_suit": "Hearts",
+                "_num": "8",
+                "_value": 8
+            },
+            "chipCount": 1000,
+            "blind": 0,
+            "currentBet": 0,
+            "handWorth": 0,
+            "turn": true,
+            "allIn": false,
+            "spectate": false,
+            "muck": false,
+            "totalValue": 0
+        },
+        {
+            "user": "Luke",
+            "card1": {
+                "_suit": "Clubs",
+                "_num": "9",
+                "_value": 9
+            },
+            "card2": {
+                "_suit": "Clubs",
+                "_num": "4",
+                "_value": 4
+            },
+            "chipCount": 1000,
+            "blind": 0,
+            "currentBet": 0,
+            "handWorth": 0,
+            "turn": true,
+            "allIn": false,
+            "spectate": false,
+            "muck": false,
+            "totalValue": 0
+        },
+        {
+            "user": "Jack",
+            "card1": {
+                "_suit": "Clubs",
+                "_num": "10",
+                "_value": 10
+            },
+            "card2": {
+                "_suit": "Diamonds",
+                "_num": "3",
+                "_value": 3
+            },
+            "chipCount": 1000,
+            "blind": 0,
+            "currentBet": 0,
+            "handWorth": 0,
+            "turn": true,
+            "allIn": false,
+            "spectate": false,
+            "muck": false,
+            "totalValue": 0
+        }
+    ],
+    "deck": [
+        {
+            "_suit": "Hearts",
+            "_num": "6",
+            "_value": 6
+        },
+        {
+            "_suit": "Clubs",
+            "_num": "Jack",
+            "_value": 11
+        },
+        {
+            "_suit": "Diamonds",
+            "_num": "5",
+            "_value": 5
+        },
+        {
+            "_suit": "Clubs",
+            "_num": "8",
+            "_value": 8
+        },
+        {
+            "_suit": "Diamonds",
+            "_num": "Queen",
+            "_value": 12
+        },
+        {
+            "_suit": "Clubs",
+            "_num": "7",
+            "_value": 7
+        },
+        {
+            "_suit": "Spades",
+            "_num": "4",
+            "_value": 4
+        },
+        {
+            "_suit": "Hearts",
+            "_num": "2",
+            "_value": 2
+        },
+        {
+            "_suit": "Hearts",
+            "_num": "7",
+            "_value": 7
+        },
+        {
+            "_suit": "Hearts",
+            "_num": "10",
+            "_value": 10
+        },
+        {
+            "_suit": "Clubs",
+            "_num": "Queen",
+            "_value": 12
+        },
+        {
+            "_suit": "Diamonds",
+            "_num": "4",
+            "_value": 4
+        },
+        {
+            "_suit": "Hearts",
+            "_num": "Jack",
+            "_value": 11
+        },
+        {
+            "_suit": "Spades",
+            "_num": "Ace",
+            "_value": 14
+        },
+        {
+            "_suit": "Hearts",
+            "_num": "9",
+            "_value": 9
+        },
+        {
+            "_suit": "Clubs",
+            "_num": "King",
+            "_value": 13
+        },
+        {
+            "_suit": "Diamonds",
+            "_num": "Ace",
+            "_value": 14
+        },
+        {
+            "_suit": "Spades",
+            "_num": "8",
+            "_value": 8
+        },
+        {
+            "_suit": "Diamonds",
+            "_num": "King",
+            "_value": 13
+        },
+        {
+            "_suit": "Spades",
+            "_num": "Queen",
+            "_value": 12
+        },
+        {
+            "_suit": "Spades",
+            "_num": "6",
+            "_value": 6
+        },
+        {
+            "_suit": "Spades",
+            "_num": "Jack",
+            "_value": 11
+        },
+        {
+            "_suit": "Spades",
+            "_num": "King",
+            "_value": 13
+        },
+        {
+            "_suit": "Hearts",
+            "_num": "5",
+            "_value": 5
+        },
+        {
+            "_suit": "Hearts",
+            "_num": "Queen",
+            "_value": 12
+        },
+        {
+            "_suit": "Hearts",
+            "_num": "Ace",
+            "_value": 14
+        },
+        {
+            "_suit": "Hearts",
+            "_num": "3",
+            "_value": 3
+        },
+        {
+            "_suit": "Diamonds",
+            "_num": "Jack",
+            "_value": 11
+        },
+        {
+            "_suit": "Hearts",
+            "_num": "4",
+            "_value": 4
+        },
+        {
+            "_suit": "Diamonds",
+            "_num": "2",
+            "_value": 2
+        },
+        {
+            "_suit": "Diamonds",
+            "_num": "10",
+            "_value": 10
+        },
+        {
+            "_suit": "Diamonds",
+            "_num": "9",
+            "_value": 9
+        },
+        {
+            "_suit": "Spades",
+            "_num": "9",
+            "_value": 9
+        },
+        {
+            "_suit": "Spades",
+            "_num": "3",
+            "_value": 3
+        },
+        {
+            "_suit": "Diamonds",
+            "_num": "8",
+            "_value": 8
+        }
+    ],
+    "pot": 30,
+    "currentBet": 20,
+    "round": 0,
+    "currentPlayer": 2,
+    "tableCards": [
+        {
+            "_suit": "Spades",
+            "_num": "5",
+            "_value": 5
+        },
+        {
+            "_suit": "Clubs",
+            "_num": "Ace",
+            "_value": 14
+        },
+        {
+            "_suit": "Spades",
+            "_num": "7",
+            "_value": 7
+        },
+        {
+            "_suit": "Spades",
+            "_num": "10",
+            "_value": 10
+        },
+        {
+            "_suit": "Clubs",
+            "_num": "3",
+            "_value": 3
+        }
+    ],
+    "lastWinners": [],
+    "playerQueue": [],
+    "active": true,
+    "blinds": [],
+    "flip": true,
+    "bombPot": false,
+    "flop1": {
+        "_suit": "None",
+        "_num": "None",
+        "_value": 0
+    },
+    "flop2": {
+        "_suit": "None",
+        "_num": "None",
+        "_value": 0
+    },
+    "flop3": {
+        "_suit": "None",
+        "_num": "None",
+        "_value": 0
+    },
+    "turn": {
+        "_suit": "None",
+        "_num": "None",
+        "_value": 0
+    },
+    "river": {
+        "_suit": "None",
+        "_num": "None",
+        "_value": 0
+    },
+    "smallBlind": 10,
+    "bigBlind": 20,
+    "Time": 0
+}

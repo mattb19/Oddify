@@ -1,0 +1,64 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Button with User Login</title>
+    <script>
+        let ws; // WebSocket connection
+        let username = ''; // Store the username of the logged-in user
+
+        // Function to initialize WebSocket connection
+        function initWebSocket() {
+            ws = new WebSocket('ws://localhost:3000');
+
+            // Listen for messages from the server
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                // Update the button text with the new count
+                document.getElementById('button').innerText = `Count: ${data.buttonCount}`;
+                // Update the "last pressed by" text
+                document.getElementById('lastPressedBy').innerText = `Last pressed by: ${data.lastPressedBy || 'N/A'}`;
+            };
+        }
+
+        // Function to handle login (set username)
+        function handleLogin() {
+            const input = document.getElementById('usernameInput');
+            if (input.value) {
+                username = input.value; // Set the username
+                document.getElementById('loginForm').style.display = 'none'; // Hide the login form
+                document.getElementById('buttonContainer').style.display = 'block'; // Show the button
+                initWebSocket(); // Initialize WebSocket connection after login
+            } else {
+                alert('Please enter a username!');
+            }
+        }
+
+        // Function to handle button press
+        function handleButtonPress() {
+            if (ws && username) {
+                // Send an increment action and the username to the server
+                ws.send(JSON.stringify({ action: 'increment', username }));
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Real-time Button Example with Login</h1>
+
+    <!-- Login Form -->
+    <div id="loginForm">
+        <label for="usernameInput">Enter your username:</label>
+        <input type="text" id="usernameInput" placeholder="Username">
+        <button onclick="handleLogin()">Login</button>
+    </div>
+
+    <!-- Button Container (hidden until login) -->
+    <div id="buttonContainer" style="display: none;">
+        <button id="button" onclick="handleButtonPress()">Count: 0</button>
+        <p id="lastPressedBy">Last pressed by: N/A</p>
+    </div>
+</body>
+</html>

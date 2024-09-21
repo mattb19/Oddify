@@ -1,35 +1,21 @@
 from library import Game, Player, TestGame
 
-names = ["Matt", "Jeremy", "Ryan", "Jackson"]
+names = ["Matt", "Jeremy", "Ryan", "Jackson", "Luke", "Jack"]
 players = [Player(name, None, None, 1000, 0) for name in names]
 
 game = Game(gameID=0, players=players, smallBlind=10, bigBlind=20)
 
 game.newRound()
+
 game.placeBetFold(20)
 game.placeBetFold(20)
+print(f"Current Bet: {game.currentBet}")
+print(f"Current Player: {game.players[game.currentPlayer].user}")
+
+pot = game.pot
+print(pot)
 game.placeBetFold(20)
-game.placeBetFold(0)
-
-game.placeBetFold(0)
-game.placeBetFold(0)
-game.placeBetFold(30)
-game.placeBetFold(30)
-game.placeBetFold(None)
-game.placeBetFold(60)
-game.placeBetFold(60)
-game.placeBetFold(60)
-
-game.placeBetFold(60)
-game.placeBetFold(60)
-game.placeBetFold(60)
-
-game.placeBetFold(200)
-game.placeBetFold(200)
-game.placeBetFold(400)
-game.placeBetFold(400)
-game.placeBetFold(400)
-
+print(game.pot)
 
 # class TestPlayer():
 #     def __init__(self, user, handWorth, totalValue) -> None:

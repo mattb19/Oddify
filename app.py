@@ -37,25 +37,25 @@ game1.newRound()
 theUser = User(1, 'LunarSleep', 'hollowknight@gmail.com', 'juul12345')
 @app.route('/')
 def home():
-    try:
-        s = session["name"]
-    except:
-        return redirect(url_for("login"))
-    games = []
-    conn = connectDB()
-    test = int(str(conn.execute("SELECT COUNT(*) FROM Game").fetchall()[0]).strip('(').strip(')').strip(','))
-    for i in range(test):
-        id = str(conn.execute("SELECT GameID FROM Game").fetchall()[i]).strip('(').strip(')').strip(',')
-        game = str(conn.execute("SELECT JSON FROM Game WHERE GameID=?", (id,)).fetchone())
-        game = game.strip('(').strip(')')
-        game = game.replace("\\", "")
-        game = game[1:]
-        game = game[:-1]
-        game = game[:-1]
-        games.append(convertGame(game))
-    cursor = str(conn.execute("SELECT GameID FROM Game").fetchall()).strip('(').strip(')').strip(',')
-    val = cursor
-    return render_template('home.html', theUser=theUser, val=val, games=games)
+    # try:
+    #     s = session["name"]
+    # except:
+    #     return redirect(url_for("login"))
+    # games = []
+    # conn = connectDB()
+    # test = int(str(conn.execute("SELECT COUNT(*) FROM Game").fetchall()[0]).strip('(').strip(')').strip(','))
+    # for i in range(test):
+    #     id = str(conn.execute("SELECT GameID FROM Game").fetchall()[i]).strip('(').strip(')').strip(',')
+    #     game = str(conn.execute("SELECT JSON FROM Game WHERE GameID=?", (id,)).fetchone())
+    #     game = game.strip('(').strip(')')
+    #     game = game.replace("\\", "")
+    #     game = game[1:]
+    #     game = game[:-1]
+    #     game = game[:-1]
+    #     games.append(convertGame(game))
+    # cursor = str(conn.execute("SELECT GameID FROM Game").fetchall()).strip('(').strip(')').strip(',')
+    # val = cursor
+    return render_template('table.html')
 
 @app.route('/userProfile/')
 def profileCard():

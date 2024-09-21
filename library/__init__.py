@@ -1,4 +1,3 @@
-print("============= Initializing Library Package =============")
 from .Card import Card
 from .CheckHands import CheckHands
 from .Game import Game
