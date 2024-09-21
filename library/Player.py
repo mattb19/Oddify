@@ -1,7 +1,7 @@
 class Player:
-    def __init__(self, user: str, card1, card2, chipCount: int, blind: int, currentBet: int = 0, handWorth: int = 0, 
-                 turn: bool = False, allIn: bool = False, 
-                 spectate: bool = False, muck: bool = False) -> None:
+    def __init__(self, user: str, card1, card2, chipCount: int, blind: int, 
+                 currentBet: int = 0, handWorth: int = 0, turn: bool = False, allIn: bool = False,
+                 totalValue:int = 0, spectate: bool = False, muck: bool = False) -> None:
         """
         Initialize a Player object.
 
@@ -29,6 +29,7 @@ class Player:
         self.allIn = allIn
         self.spectate = spectate
         self.muck = muck
+        self.totalValue = totalValue
 
     def getMuck(self) -> bool:
         """Return whether the player has mucked their hand."""
@@ -61,6 +62,14 @@ class Player:
     def setBlind(self, blind: int) -> None:
         """Set the player's blind amount."""
         self.blind = blind
+
+    def getTotalValue(self) -> int:
+        """Return the player's total amount of chips they are in the hand for"""
+        return self.totalValue
+    
+    def setTotalValue(self, value: int) -> None:
+        """Set the player's total value"""
+        self.totalValue = value
 
     def getSpectate(self) -> bool:
         """Return whether the player is spectating."""

@@ -90,51 +90,74 @@ body, html {
     z-index: 100;
 }
 
+.profilePicContainer{
+    background-image: linear-gradient(to top left, rgba(39, 44, 34, .7), rgba(4, 43, 1, 1));
+    width: 300px;
+    padding: 8px;
+    border-radius: 18px;
+}
+
 .profilePicture{
     width: 100px;
-    border-radius: 50%;
+    border-radius: 13%;
+    margin-top: 3px;
+    margin-left: 179px;
 }
 
-.profilePicContainer{
-    z-index: 100;
+.profilePictureR{
+    width: 100px;
+    border-radius: 13%;
+    margin-top: 3px;
+    margin-left: 5px;
 }
 
-.playerTagContainer{
-    position: relative;
-    z-index: 99;
-    width: 1700px;
-    right:106px;
-}
-
-.playerTag{
-    width: 25%;
-    height: 165px;
-}
-
-.playerInfoContainer{
+.playerChipCountL{
     position: absolute;
-    z-index: 101;
-    left:6.1%;
+    right: 38%;
+    bottom: 23%;
+    font-size: 28px;
+    margin-right: 8px;
+    text-align: right;
 }
 
-.playerChipCount{
-    font-size: 17px;
+.playerNameL{
+    position: absolute;
+    right: 38%;
+    bottom: 53%;
+    font-size: 16px;
+    margin-right: 8px;
+    margin-top: 3px;
+    margin-bottom: 5px;
 }
 
-.playerName{
-    font-size: 22px;
+.playerChipCountR{
+    position: absolute;
+    left: 38%;
+    bottom: 23%;
+    font-size: 28px;
+    margin-left: 8px;
+    text-align: left;
+}
+
+.playerNameR{
+    position: absolute;
+    left: 38%;
+    bottom: 53%;
+    font-size: 16px;
+    margin-left: 8px;
+    margin-top: 3px;
+    margin-bottom: 5px;
 }
 
 /* Positioning the player slots */
-#player1 { bottom: 15%; left: calc(70%); transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
-#player2 { bottom: 25%; right: calc(14.5%); transform: translate(-50%, -50%); } /* Moved from 20.5% to 14.5% */
-#player3 { top: 49%; right: calc(10.3%); transform: translate(-50%, -50%); } /* Moved from 16.3% to 10.3% */
-#player4 { top: 25%; right: calc(16.5%); transform: translate(-50%, -50%); } /* Moved from 22.5% to 16.5% */
-#player5 { top: 18.5%; right: calc(32%); transform: translate(-50%, -50%); } /* Moved from 38% to 32% */
-#player6 { top: 18.5%; left: calc(44%); transform: translate(-50%, -50%); } /* Moved from 38% to 44% */
-#player7 { top: 25%; left: calc(28.5%); transform: translate(-50%, -50%); } /* Moved from 22.5% to 28.5% */
-#player8 { top: 49%; left: calc(22.3%); transform: translate(-50%, -50%); } /* Moved from 16.3% to 22.3% */
-#player9 { bottom: 25%; left: calc(24.5%); transform: translate(-50%, -50%); } /* Moved from 20.5% to 24.5% */
+#player1 { bottom: 20%; left: calc(18%); transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
+#player2 { top: 49%; left: calc(15%); transform: translate(-50%, -50%); } /* Moved from 20.5% to 14.5% */
+#player3 { bottom: 62%; left: calc(19%); transform: translate(-50%, -50%); } /* Moved from 16.3% to 10.3% */
+#player4 { top: 18.5%; left: calc(40%); transform: translate(-50%, -50%); } /* Moved from 22.5% to 16.5% */
+#player5 { top: 18.5%; left: calc(60%); transform: translate(-50%, -50%); } /* Moved from 38% to 32% */
+#player6 { bottom: 62%; left: calc(81%); transform: translate(-50%, -50%); } /* Moved from 38% to 44% */
+#player7 { top: 49%; left: calc(85%); transform: translate(-50%, -50%); } /* Moved from 22.5% to 28.5% */
+#player8 { bottom: 20%; left: calc(82%); transform: translate(-50%, -50%); } /* Moved from 16.3% to 22.3% */
 
 
 
@@ -147,7 +170,7 @@ body, html {
 
 .tableInfoContainer {
     position: fixed; /* Fixed positioning to keep it on top */
-    top: 60%;
+    top: 54%;
     left: 50%;
     transform: translate(-50%, -50%); /* Centering */
     z-index: 1000; /* Ensure it is on top of other elements */
@@ -178,7 +201,7 @@ body, html {
 
 .tableCardsContainer {
     position: fixed; /* Fixed positioning to keep it on top */
-    top: 55%;
+    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%); /* Centering */
     z-index: 1001; /* Ensure it is on top of other elements */
@@ -203,25 +226,28 @@ body, html {
 
 .buttonContainer {
     position: fixed; /* Keep it fixed to the viewport */
-    bottom: 20px; /* Distance from the bottom */
+    bottom: 15%; /* Distance from the bottom */
     left: 50%; /* Center horizontally */
     transform: translateX(-50%); /* Adjust to center */
     display: flex; /* Align buttons in a row */
     gap: 20px; /* Space between buttons */
     z-index: 1000; /* Ensure it's above other elements */
-    background-color: rgba(0, 0, 0, 0.2); /* Semi-transparent black background */
-    padding: 20px; /* Add some padding */
+    background-image: linear-gradient(to top left, rgba(51, 5, 5, 1), rgba(51, 83, 51, 1));
+    padding: 25px 38px; /* Add some padding */
     border-radius: 15px; /* Optional: round corners */
 }
 
 .actionButton {
-    padding: 15px 25px;
-    font-size: 16px;
+    padding: 23px 38px;
+    font-size: 20px;
     cursor: pointer;
     color: white; /* Change the font color to white */
-    background-color: rgba(0, 0, 0, 0.7); /* Optional: background color */
+    background-color: rgba(255, 255, 255, 0.2); /* Optional: background color */
     border: none; /* Remove default button border */
     border-radius: 10px; /* Optional: round corners */
+    font-family: "Tahoma", sans-serif;
+    font-weight: bold;
+    touch-action: manipulation;
 }
 
 #betSliderContainer {
@@ -239,7 +265,15 @@ body, html {
     display: none; /* Align buttons in a row */
     gap: 20px; /* Space between buttons */
     z-index: 1000; /* Ensure it's above other elements */
-    background-color: rgba(0, 0, 0, 0.2); /* Semi-transparent black background */
+    background-image: linear-gradient(to top left, rgba(51, 5, 5, .7), rgba(51, 83, 51, 1));
     padding: 20px; /* Add some padding */
     border-radius: 15px; /* Optional: round corners */
+}
+
+.actionButton span {
+    transition: all 200ms;
+}
+
+.actionButton:hover span {
+    opacity: .6;
 }

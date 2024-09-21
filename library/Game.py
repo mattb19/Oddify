@@ -129,6 +129,7 @@ class Game:
         # Set player hands worth to 0
         for player in self.players:
             player.setHandWorthZero()
+            player.setTotalValue(0)
 
         # Initialize or rotate blinds
         if not self.active:
@@ -156,10 +157,12 @@ class Game:
             if player.getBlind() == 1:
                 player.setCurrentBet(self.smallBlind)
                 player.setChipCount(player.getChipCount()-self.smallBlind)
+                player.setTotalValue(self.smallBlind)
                 self.pot += self.smallBlind
             elif player.getBlind() == 2:
                 player.setCurrentBet(self.bigBlind)
                 player.setChipCount(player.getChipCount()-self.bigBlind)
+                player.setTotalValue(self.bigBlind)
                 self.pot += self.bigBlind
 
         self.currentBet = self.bigBlind
@@ -176,14 +179,6 @@ class Game:
 
         # Set current player to the one after the big blind
         self.setCurrentPlayer()
-
-        # Handle bomb pot if applicable
-        if self.bombPot:
-            time.sleep(5)
-            for player in self.players:
-                if not player.getSpectate():
-                    bet_amount = 0.10 * 1000
-                    self.placeBetFold(bet_amount)
                     
         print("============= PRE FLOP =============")
 
@@ -234,44 +229,47 @@ class Game:
 
         # Get the current player
         player = self.players[self.currentPlayer]
-
+        result = ""
         if value is None:
             # Player folds
             player.setFolded()
             player.setTurn(False)
-            result = f"{player.getUser()} Folds."
+            print(f"{player.getUser()} Folds.")
             
         elif value == 0 and player.getCurrentBet() == self.currentBet:
             # Player checks
             player.setTurn(False)
-            result =  f"{player.getUser()} Checks."
+            print(f"{player.getUser()} Checks.")
         
         elif value == self.currentBet and value < player.getChipCount():
             # Player calls
+            player.setTotalValue(player.getTotalValue()+(value - player.getCurrentBet()))
             player.setChipCount(player.getChipCount()-(value - player.getCurrentBet()))
             player.setTurn(False)
             self.pot += value - player.getCurrentBet()
             player.setCurrentBet(self.currentBet)
-            result =  f"{player.getUser()} Calls {value}! {player.getUser()}'s current bet is {self.currentBet}. Pot is {self.pot}"
+            print(f"{player.getUser()} Calls {value}! {player.getUser()}'s current bet is {player.currentBet}. Pot is {self.pot}")
         
         elif value > self.currentBet and value < player.getChipCount():
             # Player raises
+            player.setTotalValue(player.getTotalValue()+(value - player.getCurrentBet()))
             player.setChipCount(player.getChipCount()-(value - player.getCurrentBet()))
             player.setTurn(False)
             self.currentBet = value
             self.pot += value - player.getCurrentBet()
             player.setCurrentBet(self.currentBet)
-            result =  f"{player.getUser()} Bets {value}! {player.getUser()}'s current bet is {self.currentBet}. Pot is {self.pot}"
+            print(f"{player.getUser()} Raises to {value}! {player.getUser()}'s current bet is {player.currentBet}. Pot is {self.pot}")
         
         elif value - player.getCurrentBet() == player.getChipCount():
             # Player goes all-in
+            player.setTotalValue(player.getTotalValue()+(value - player.getCurrentBet()))
             player.setChipCount(0)
             player.setTurn(False)
             self.pot += value - player.getCurrentBet()
             self.currentBet = max(self.currentBet, value)
             player.setAllIn(True)
             player.setCurrentBet(value)
-            result = f"{player.getUser()} IS ALL IN!"
+            print(f"{player.getUser()} IS ALL IN!")
             
         elif value + player.getCurrentBet() < self.currentBet:
             # Not enough to call or raise
@@ -283,11 +281,11 @@ class Game:
         
         # Set turns for remaining players
         for p in self.players:
-            if not p.getSpectate() and p.getCurrentBet() and p.getCurrentBet() < self.currentBet:
+            if not p.getSpectate() and p.getCurrentBet() is not None and p.getCurrentBet() < self.currentBet:
                 p.setTurn(True)
         
         message = self.proceedToNextStage()
-        return result+"\n"+message if message else result
+        return (result, message) if message else result
         
     def proceedToNextStage(self): 
         """
@@ -386,10 +384,13 @@ class Game:
             # Output the stage of the game
             if self.round == 1:
                 result = "============= FLOP ============="
+                print("============= FLOP =============")
             elif self.round == 2:
                 result = "============= TURN ============="
+                print("============= TURN =============")
             elif self.round == 3:
                 result = "============= RIVER ============="
+                print("============= RIVER =============")
 
             # Reset current bets for players who are not all-in or spectating
             for i in self.players:
@@ -420,15 +421,12 @@ class Game:
         and resetting player statuses and game state for the next hand.
         """
         print("============= END OF ROUND =============")
-        # Filter out players who have a valid bet
-        finalPlayers = [p for p in self.players if p.getCurrentBet() is not None]
-        
         # Initialize hand evaluator
         check = CheckHands()
         
         print("- Evaluating hands")
         # Evaluate each player's hand
-        for player in finalPlayers:
+        for player in self.players:
             cards = [self.tableCards[0], self.tableCards[1], self.tableCards[2], 
                     self.tableCards[3], self.tableCards[4], player.getCard1(), player.getCard2()]
             
@@ -446,9 +444,7 @@ class Game:
                     break
         
         print("- Distributing winnings")
-        winnings = self.split_pot(finalPlayers)
-        
-        print(winnings)
+        winnings = self.split_pot(self.players)
         
         for name, take in winnings.items():
             for i in self.players:
@@ -458,6 +454,8 @@ class Game:
         for player in self.players:
             player.setCurrentBetZero()
             player.setHandWorthZero()
+            
+        return winnings
 
     def split_pot(self, winners):
         """
@@ -470,10 +468,10 @@ class Game:
             dict: A dictionary with player usernames as keys and their respective winnings as values.
         """
 
-        # Sort winners by hand worth, and by currentBet if worths are equal
+        # Sort winners by hand worth, and by totalValue if worths are equal
         # The sorting ensures that players with higher hand worth come first,
-        # and in case of ties, the player with the higher currentBet comes first.
-        winners_sorted = sorted(winners, key=lambda player: (player.handWorth, -player.currentBet), reverse=True)
+        # and in case of ties, the player with the higher totalValue comes first.
+        winners_sorted = sorted(winners, key=lambda player: (player.handWorth, -player.totalValue), reverse=True)
 
         # Group sorted winners by hand worth
         grouped_winners = {key: list(group) for key, group in groupby(winners_sorted, key=lambda player: player.handWorth)}
@@ -482,16 +480,16 @@ class Game:
         distribution = {i.user: 0 for i in winners_sorted}
         # Iterate over each group of players with the same hand worth
         for group in grouped_winners.values():
-            # Create a new dictionary to group players by their currentBet
-            new_dict = {player.currentBet: [] for player in group}
-            # This dictionary will hold lists of players for each unique currentBet value.
+            # Create a new dictionary to group players by their totalValue
+            new_dict = {player.totalValue: [] for player in group}
+            # This dictionary will hold lists of players for each unique totalValue value.
 
-            # Populate the new_dict with players based on their currentBet
+            # Populate the new_dict with players based on their totalValue
             for i in group:
-                new_dict[i.currentBet].append(i)
+                new_dict[i.totalValue].append(i)
             # Copy result to a new dictionary for processing
             result_dict = {key: players[:] for key, players in new_dict.items()}
-            # Combine players with lower currentBet with those of higher currentBet
+            # Combine players with lower totalValue with those of higher totalValue
             for lower_key in sorted(result_dict.keys()):
                 for higher_key in sorted(result_dict.keys()):
                     if higher_key > lower_key:
@@ -501,14 +499,11 @@ class Game:
             result_dict = {key: list(set(players)) for key, players in result_dict.items()}
             # This ensures that each player appears only once in the resulting list.
 
-            # Create a new dictionary with differences in currentBet as keys
-            my_dict = {}
+            # Create a new dictionary with differences in totalValue as keys
             prev_key = None
             new_dict2 = []
 
             # Populate new_dict2 with the differences between successive keys
-            # <PROBLEM> - This will not work if the difference is already an existing key. it will be overridden
-            # Need to implement the algorithm using lists instead, rewriting the splitting logic
             for key in sorted(result_dict.keys()):
                 # If prev_key is None, use the current key; otherwise, use the difference from prev_key
                 new_dict2.append([key if prev_key is None else key - prev_key, result_dict[key]])
@@ -524,17 +519,17 @@ class Game:
                 # Distribute winnings to each player in the current group
                 for player in players:
                     for w in winners_sorted:
-                        if take * split > w.currentBet:
+                        if take * split > w.totalValue:
                             # If total take exceeds the current bet of the player
-                            distribution[player.user] += w.currentBet // split
+                            distribution[player.user] += w.totalValue // split
                             # Add the share of the winnings to the player's distribution
                             if player == final_player:
-                                w.currentBet = 0  # Set the currentBet of the last player to 0
+                                w.totalValue = 0  # Set the totalValue of the last player to 0
                         else:
                             # If total take is less than or equal to the current bet
                             distribution[player.user] += take  # Distribute the full take to the player
                             if player == final_player:
-                                w.currentBet -= take * split  # Deduct the distributed amount from the last player's currentBet
+                                w.totalValue -= take * split  # Deduct the distributed amount from the last player's totalValue
 
         return distribution  # Return the final distribution of winnings
      

@@ -16,37 +16,64 @@
                 <div class="profilePicContainer">
                     <img src="../images/general/yuhfar.png" class="profilePicture">
                 </div>
-                <div class="playerInfoContainer">
-                    <div class="playerName" id="player1Name">KingDaddyEJP#15</div>
-                    <div class="playerChipCount" id="player1ChipCount">100</div>
-                </div>
-                <div class="playerTagContainer">
-                    <img src="../images/general/tag.png" class="playerTag">
-                </div>
+                <div class="playerChipCountL" id="player1ChipCount" style="text-align: right;">1000</div>
+                <div class="playerNameL" id="player1Name">Player 1</div>
             </div>
+            
             <div class="playerSlot" id="player2">
-                <img src="../images/general/yuhfar.png" class="profilePicture">
+                <div class="profilePicContainer">
+                    <img src="../images/general/yuhfar.png" class="profilePicture">
+                </div>
+                <div class="playerChipCountL" id="player2ChipCount" style="text-align: right;">1000</div>
+                <div class="playerNameL" id="player2Name">Player 2</div>
             </div>
+            
             <div class="playerSlot" id="player3">
-                <img src="../images/general/yuhfar.png" class="profilePicture">
+                <div class="profilePicContainer">
+                    <img src="../images/general/yuhfar.png" class="profilePicture">
+                </div>
+                <div class="playerChipCountL" id="player3ChipCount" style="text-align: right;">1000</div>
+                <div class="playerNameL" id="player3Name">Player 3</div>
             </div>
+            
             <div class="playerSlot" id="player4">
-                <img src="../images/general/yuhfar.png" class="profilePicture">
+                <div class="profilePicContainer">
+                    <img src="../images/general/yuhfar.png" class="profilePicture">
+                </div>
+                <div class="playerChipCountL" id="player4ChipCount" style="text-align: right;">1000</div>
+                <div class="playerNameL" id="player4Name">Player 4</div>
             </div>
+            
             <div class="playerSlot" id="player5">
-                <img src="../images/general/yuhfar.png" class="profilePicture">
+                <div class="profilePicContainer">
+                    <img src="../images/general/yuhfar.png" class="profilePictureR">
+                </div>
+                <div class="playerChipCountR" id="player5ChipCount" style="text-align: right;">1000</div>
+                <div class="playerNameR" id="player5Name">Player 5</div>
             </div>
+            
             <div class="playerSlot" id="player6">
-                <img src="../images/general/yuhfar.png" class="profilePicture">
+                <div class="profilePicContainer">
+                    <img src="../images/general/yuhfar.png" class="profilePictureR">
+                </div>
+                <div class="playerChipCountR" id="player6ChipCount" style="text-align: right;">1000</div>
+                <div class="playerNameR" id="player6Name">Player 6</div>
             </div>
+            
             <div class="playerSlot" id="player7">
-                <img src="../images/general/yuhfar.png" class="profilePicture">
+                <div class="profilePicContainer">
+                    <img src="../images/general/yuhfar.png" class="profilePictureR">
+                </div>
+                <div class="playerChipCountR" id="player7ChipCount" style="text-align: right;">1000</div>
+                <div class="playerNameR" id="player7Name">Player 7</div>
             </div>
+            
             <div class="playerSlot" id="player8">
-                <img src="../images/general/yuhfar.png" class="profilePicture">
-            </div>
-            <div class="playerSlot" id="player9">
-                <img src="../images/general/yuhfar.png" class="profilePicture">
+                <div class="profilePicContainer">
+                    <img src="../images/general/yuhfar.png" class="profilePictureR">
+                </div>
+                <div class="playerChipCountR" id="player8ChipCount" style="text-align: right;">1000</div>
+                <div class="playerNameR" id="player8Name">Player 8</div>
             </div>
         </div>
     </div>
@@ -62,13 +89,13 @@
         <img src="../images/poker cards/None_of_None.png" class="tableCard" id="river">
     </div>
     <div class="actionContainer">
-        <div class="buttonContainer">
-            <button class="actionButton" id="activateSlider">BET</button>
-            <button class="actionButton" id="callButton">CALL</button>
-            <button class="actionButton" id="foldButton">FOLD</button>
+        <div class="buttonContainer" id="buttonContainer">
+            <button class="actionButton" id="activateSlider"><span>BET</span></button>
+            <button class="actionButton" id="callButton"><span>CALL</span></button>
+            <button class="actionButton" id="foldButton"><span>FOLD</span></button>
             <script src="tableEvents.js"></script>
         </div>
-        <div class="sliderContainer">
+        <div class="sliderContainer" id="sliderContainer">
             <input type="range" min="1" max="100" value="50" id="valueSlider">
             <button id="betButton">Bet</button>
         </div>
