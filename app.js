@@ -107,8 +107,8 @@ io.on('connection', (socket) => {
 
     socket.emit('updateInfo', game);
 
-    // Handle call button event
-    socket.on('call', async (data) => {
+    // Handle action button event, used to be on('call')
+    socket.on('action', async (data) => {
         const action = data.buttonId
 
         try {

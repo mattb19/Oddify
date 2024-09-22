@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poker Table</title>
+    <link rel="stylesheet" href="/table.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/socketHandler.js" defer></script>
+</head>
+<body>
+    <div class="tableContainer">
+        <div class="circle"></div>
+        <div class="hole"></div>
+        <div class="table"></div>
+    </div>
+    <div class="userCardContainer">
+        <img src="images/poker cards/3_of_hearts.png" class="userCard2">
+        <img src="images/poker cards/10_of_clubs.png" class="userCard1">
+    </div>
+    <div class="tableInfoContainer">
+        <div class="pot" id="potAmount">200</div>
+        <div class="currentBet" id="currentBetAmount">Current Bet: 20</div>
+    </div>
+    <div class="custom-slider-container">
+        <input type="range" class="custom-slider" min="0" max="1000" value="50" oninput="rangeValue.innerText = this.value">
+        <button class="actionButton" id="customBets"><span><p id="rangeValue">50</p></span></button>
+    </div>
+    <div class="customBetContainer">
+        <div class="buttonContainer" id="buttonContainer">
+            <button class="actionButton" id="customBets" onclick="action(-1)"><span><p id="cVal">20</p></span></button>
+            <button class="actionButton" id="customBets" onclick="action('CALL')"><span><p id="cVal">40</p></span></button>
+            <button class="actionButton" id="customBets" onclick="showBetSlider()"><span><p id="cVal">200</p></span></button>
+            <button class="actionButton" id="customBets" onclick="showBetSlider()"><span><p id="cVal">ALL IN</p></span></button>
+        </div>
+    </div>
+    <div class="actionContainer">
+        <div class="buttonContainer" id="buttonContainer">
+            <button class="actionButton" id="fold" onclick="action(-1)"><span>FOLD</span></button>
+            <button class="actionButton" id="call" onclick="action('CALL')"><span>CALL</span></button>
+            <button class="actionButton" id="bet" onclick="showBetSlider()"><span>BET</span></button>
+        </div>
+    </div>
+    <div class="tableContainer">
+        <div class="playerContainer">
+            <div class="playerSlot" id="player1">
+                <div class="playerCardContainer" style="top: 3vh;left: 5vw;">
+                    <img src="images/poker cards/None_of_None.png" class="playerCard1" id="p1c1">
+                    <img src="images/poker cards/None_of_None.png" class="playerCard2" id="p1c2">
+                </div>
+                <div class="playerName" id="player1Name">lastlunarleap</div>
+                <img src="images/general/yuhfar.png" class="profilePicture">
+                <div class="playerChipCount" id="player1ChipCount">100</div>
+            </div>
+            <div class="playerSlot" id="player2">
+                <div class="playerCardContainer" style="top: 3vh;left: 5vw;">
+                    <img src="images/poker cards/None_of_None.png" class="playerCard1" id="p2c1">
+                    <img src="images/poker cards/None_of_None.png" class="playerCard2" id="p2c2">
+                </div>
+                <div class="playerName" id="player2Name">mcmattman</div>
+                <img src="images/general/yuhfar.png" class="profilePicture">
+                <div class="playerChipCount" id="player2ChipCount">200</div>
+            </div>
+        
+            <div class="playerSlot" id="player3">
+                <div class="playerCardContainer" style="top: 3vh;left: 5vw;">
+                    <img src="images/poker cards/None_of_None.png" class="playerCard1" id="p2c1">
+                    <img src="images/poker cards/None_of_None.png" class="playerCard2" id="p2c2">
+                </div>
+                <div class="playerName" id="player3Name">player3name</div>
+                <img src="images/general/yuhfar.png" class="profilePicture">
+                <div class="playerChipCount" id="player3ChipCount">300</div>
+            </div>
+        
+            <div class="playerSlot" id="player4">
+                <div class="playerCardContainer" style="top: 3vh;left: 5vw;">
+                    <img src="images/poker cards/None_of_None.png" class="playerCard1" id="p4c1">
+                    <img src="images/poker cards/None_of_None.png" class="playerCard2" id="p4c2">
+                </div>
+                <div class="playerName" id="player4Name">player4name</div>
+                <img src="images/general/yuhfar.png" class="profilePicture">
+                <div class="playerChipCount" id="player4ChipCount">400</div>
+            </div>
+        
+            <div class="playerSlot" id="player5">
+                <div class="playerCardContainer" style="top: 3vh;left: -3.7vw;">
+                    <img src="images/poker cards/None_of_None.png" class="playerCard1" id="p5c1">
+                    <img src="images/poker cards/None_of_None.png" class="playerCard2" id="p5c2">
+                </div>
+                <div class="playerName" id="player5Name">player5name</div>
+                <img src="images/general/yuhfar.png" class="profilePicture">
+                <div class="playerChipCount" id="player5ChipCount">500</div>
+            </div>
+        
+            <div class="playerSlot" id="player6">
+                <div class="playerCardContainer" style="top: 3vh;left: -3.7vw;">
+                    <img src="images/poker cards/None_of_None.png" class="playerCard1" id="p6c1">
+                    <img src="images/poker cards/None_of_None.png" class="playerCard2" id="p6c2">
+                </div>
+                <div class="playerName" id="player6Name">player6name</div>
+                <img src="images/general/yuhfar.png" class="profilePicture">
+                <div class="playerChipCount" id="player6ChipCount">600</div>
+            </div>
+        
+            <div class="playerSlot" id="player7">
+                <div class="playerCardContainer" style="top: 3vh;left: -3.7vw;">
+                    <img src="images/poker cards/None_of_None.png" class="playerCard1" id="p7c1">
+                    <img src="images/poker cards/None_of_None.png" class="playerCard2" id="p7c2">
+                </div>
+                <div class="playerName" id="player7Name">player7name</div>
+                <img src="images/general/yuhfar.png" class="profilePicture">
+                <div class="playerChipCount" id="player7ChipCount">700</div>
+            </div>
+        
+            <div class="playerSlot" id="player8">
+                <div class="playerCardContainer" style="top: 3vh;left: -3.7vw;">
+                    <img src="images/poker cards/None_of_None.png" class="playerCard1" id="p8c1">
+                    <img src="images/poker cards/None_of_None.png" class="playerCard2" id="p8c2">
+                </div>
+                <div class="playerName" id="player8Name">player8name</div>
+                <img src="images/general/yuhfar.png" class="profilePicture">
+                <div class="playerChipCount" id="player8ChipCount">800</div>
+            </div>
+        </div>
+    </div>
+    <div class="tableCardsContainer">
+        <img src="images/poker cards/None_of_None.png" class="tableCard" id="flop1">
+        <img src="images/poker cards/None_of_None.png" class="tableCard" id="flop2">
+        <img src="images/poker cards/None_of_None.png" class="tableCard" id="flop3">
+        <img src="images/poker cards/None_of_None.png" class="tableCard" id="turn">
+        <img src="images/poker cards/None_of_None.png" class="tableCard" id="river">
+    </div>
+    <div class="username" id="welcomeMessage">
+        <script>
+            const username = '<%= username %>'; // Use EJS syntax to access the session variable
+            document.write(`Welcome, ${username}`);
+        </script>
+    </div>
+</body>
+</html>
