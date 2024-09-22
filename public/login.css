@@ -9,12 +9,15 @@ a:link, a:visited {
 a:hover, a:focus {
    color: rgb(26, 81, 133);
 }
- html {
+html {
     height: 100%;
     font-family: "Tahoma", sans-serif;
     font-weight: bold;
     background-color: rgb(8, 26, 43);
 }
+
+
+
 body {
     width: 35vw;
     height: 90%;
@@ -42,10 +45,18 @@ body {
     box-shadow: 3px 3px 10px black;
 }
 .loginForm {
+    display: inline;
     height: 90%;
     text-align: center;
     padding: 2vh;
 } 
+.registerForm {
+    display: none;
+    height: 90%;
+    text-align: center;
+    padding: 2vh;
+} 
+
 .left {
     font-size: 1.5vw;
     float: left;
@@ -67,6 +78,13 @@ label[for=remember] {
     text-decoration: none;
 }
 #signUp {
+    display: inline;
+    font-size: 1vw;
+    text-decoration: none;
+    font-weight: 100;
+}
+#signIn {
+    display: none;
     font-size: 1vw;
     text-decoration: none;
     font-weight: 100;
@@ -86,6 +104,8 @@ input[type=text]:hover, input[type=text]:focus {
 ::placeholder {
     color: rgb(122, 122, 122);
 }
+
+
 .actionButton {
     margin: 4.8vh 0vw; 
     width: 30vw;
@@ -103,8 +123,23 @@ input[type=text]:hover, input[type=text]:focus {
 .actionButton span {
     transition: all 200ms;
 }
-
 .actionButton:hover span{
     opacity: .6;
+}
+@keyframe in {
+    0% {
+        display: none;
+    }
+    100% {
+        display: inline;
+    }
+}
+@keyframe out {
+    0% {
+        display: inline;
+    }
+    100% {
+        display: none;
+    }
 }
 
