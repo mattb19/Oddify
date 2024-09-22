@@ -27,7 +27,7 @@ app.set('view engine', 'ejs');
 // This function initializes a game object
 async function initializeGame() {
     return new Promise((resolve, reject) => {
-        exec('python initializeGame.py', (error, stdout, stderr) => {
+        exec('python3 initializeGame.py', (error, stdout, stderr) => {
             if (error) {
                 return reject(`Error: ${stderr}`);
             }
@@ -40,7 +40,7 @@ async function initializeGame() {
 function handleBet(inputGame, inputBet) {
     return new Promise((resolve, reject) => {
         const input = JSON.stringify(inputGame);
-        const process = exec(`python handleBet.py "${inputBet}"`, { shell: true });
+        const process = exec(`python3 handleBet.py "${inputBet}"`, { shell: true });
 
         console.log(inputBet);
 

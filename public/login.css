@@ -1,0 +1,110 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+a:link, a:visited {
+    color: rgb(48, 33, 122);
+}
+a:hover, a:focus {
+   color: rgb(26, 81, 133);
+}
+ html {
+    height: 100%;
+    font-family: "Tahoma", sans-serif;
+    font-weight: bold;
+    background-color: rgb(8, 26, 43);
+}
+body {
+    width: 35vw;
+    height: 90%;
+    margin: auto;
+}
+.loginContainer {
+    height: 100%;
+}
+.bodyhead {
+    margin-top: 5%;
+    font-size: 3vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 30%;
+}
+.welcome {
+    color:white;
+}
+.bodysection {
+    text-align: center;
+    border-radius: 10px;
+    height: 70%;
+    background-color: white;
+    box-shadow: 3px 3px 10px black;
+}
+.loginForm {
+    height: 90%;
+    text-align: center;
+    padding: 2vh;
+} 
+.left {
+    font-size: 1.5vw;
+    float: left;
+    padding: 1vh 1vw;
+}
+.login-options {
+    font-size: 1vw;
+}
+label[for=remember] {
+    font-weight: 100;
+}
+#remember {
+    font-weight: 100;
+    padding-right: 25%;
+}
+#forgot {
+    font-weight: 100;
+    padding-left: 25%;
+    text-decoration: none;
+}
+#signUp {
+    font-size: 1vw;
+    text-decoration: none;
+    font-weight: 100;
+}
+input[type=text] {
+    padding: 2vh 0vw 2vh 1vw;
+    width: 30vw;
+    height: 6vh;
+    box-sizing: border-box;
+    border: 1px solid rgb(77, 77, 77);
+    background-color: rgb(255, 255, 255);
+    border-radius: .3vw;
+}
+input[type=text]:hover, input[type=text]:focus {
+    border: 2px solid rgb(14,47,78);
+}
+::placeholder {
+    color: rgb(122, 122, 122);
+}
+.actionButton {
+    margin: 4.8vh 0vw; 
+    width: 30vw;
+    padding: 2vh 1.5vw;
+    font-size: 1.5vw;
+    cursor: pointer;
+    color: white; /* Change the font color to white */
+    background-color: rgb(14,47,78); /* Optional: background color */
+    border: none; /* Remove default button border */
+    border-radius: 15px; /* Optional: round corners */
+    font-family: "Tahoma", sans-serif;
+    font-weight: bold;
+    touch-action: manipulation;
+}
+.actionButton span {
+    transition: all 200ms;
+}
+
+.actionButton:hover span{
+    opacity: .6;
+}
+
