@@ -1,12 +1,14 @@
 import random
 import time
 import json
-from library import Card, Player, CheckHands
+from library.Player import Player
+from library.CheckHands import CheckHands
+from library.Card import Card
 from copy import deepcopy
 from itertools import groupby
 
 class Game:
-    def __init__(self, gameID, players, smallBlind, bigBlind, deck=None, pot=0, currentBet=0, round=0, currentPlayer=None, tableCards=None, 
+    def __init__(self, gameID=0, players=[], smallBlind=10, bigBlind=20, deck=None, pot=0, currentBet=0, round=0, currentPlayer=None, tableCards=None, 
                  lastWinners=None, playerQueue=None, active=False, blinds=None, flip=True, bombPot=False, 
                  flop1=None, flop2=None, flop3=None, turn=None, river=None, Time=0) -> None:
         """
@@ -627,25 +629,113 @@ class Game:
         return "Activated!"
     
     def json(self):
-        """
-        Serializes the game state into JSON format.
-        Returns a dictionary representation of the game.
-        """
-        try:
-            # Create a deep copy of the game instance
-            game = deepcopy(self)
+        def serialize_card(card):
+            return {
+                '_suit': card._suit,
+                '_num': card._num,
+                '_value': card._value
+            }
 
-            # Set table cards
-            game.setTableCards()
-            
-            # Prepare players for serialization
-            game.setPlayers([player.__dict__ for player in game.getPlayers()])
-            
-            # Serialize the game to JSON format
-            return json.loads(json.dumps(game, default=lambda o: o.__dict__))
+        def serialize_player(player):
+            return {
+                'user': player.user,
+                'card1': serialize_card(player.card1),
+                'card2': serialize_card(player.card2),
+                'chipCount': player.chipCount,
+                'blind': player.blind,
+                'currentBet': player.currentBet,
+                'handWorth': player.handWorth,
+                'turn': player.turn,
+                'allIn': player.allIn,
+                'spectate': player.spectate,
+                'muck': player.muck,
+                'totalValue': player.totalValue
+            }
+
+        game_data = {
+            'gameID': self.gameID,
+            'players': [serialize_player(player) for player in self.players],
+            'deck': [serialize_card(card) for card in self.deck],
+            'pot': self.pot,
+            'currentBet': self.currentBet,
+            'round': self.round,
+            'currentPlayer': self.currentPlayer,
+            'tableCards': [serialize_card(card) for card in self.tableCards],
+            'lastWinners': [winner.user for winner in self.lastWinners],
+            'playerQueue': [player.user for player in self.playerQueue],
+            'active': self.active,
+            'blinds': self.blinds,
+            'flip': self.flip,
+            'bombPot': self.bombPot,
+            'flop1': serialize_card(self.flop1),
+            'flop2': serialize_card(self.flop2),
+            'flop3': serialize_card(self.flop3),
+            'turn': serialize_card(self.turn),
+            'river': serialize_card(self.river),
+            'smallBlind': self.smallBlind,
+            'bigBlind': self.bigBlind,
+            'Time': self.Time
+        }
         
-        except TypeError as e:
-            return None
+        return json.dumps(game_data, default=str)  # Convert to JSON string
+
+    def from_json(self, json_data):
+        # Parse the JSON string to a Python dictionary
+        data = json.loads(json_data)
+
+        # Create Player objects from the parsed data
+        self.players = []
+        for player_data in data['players']:
+            card1 = Card(
+                player_data['card1']['_suit'],
+                player_data['card1']['_num'],
+                player_data['card1']['_value']
+            )
+            card2 = Card(
+                player_data['card2']['_suit'],
+                player_data['card2']['_num'],
+                player_data['card2']['_value']
+            )
+
+            player = Player(
+                user=player_data['user'],
+                card1=card1,
+                card2=card2,
+                chipCount=player_data['chipCount'],
+                blind=player_data['blind'],
+                currentBet=player_data['currentBet'],
+                handWorth=player_data['handWorth'],
+                turn=player_data['turn'],
+                allIn=player_data['allIn'],
+                spectate=player_data['spectate'],
+                muck=player_data['muck'],
+                totalValue=player_data['totalValue']
+            )
+            self.players.append(player)
+
+        # Create Card objects for flop, turn, and river
+        self.flop1 = Card(data['flop1']['_suit'], data['flop1']['_num'], data['flop1']['_value'])
+        self.flop2 = Card(data['flop2']['_suit'], data['flop2']['_num'], data['flop2']['_value'])
+        self.flop3 = Card(data['flop3']['_suit'], data['flop3']['_num'], data['flop3']['_value'])
+        self.turn = Card(data['turn']['_suit'], data['turn']['_num'], data['turn']['_value'])
+        self.river = Card(data['river']['_suit'], data['river']['_num'], data['river']['_value'])
+
+        # Set other attributes
+        self.gameID = data['gameID']
+        self.smallBlind = data['smallBlind']
+        self.bigBlind = data['bigBlind']
+        self.pot = data['pot']
+        self.currentBet = data['currentBet']
+        self.round = data['round']
+        self.currentPlayer = data['currentPlayer']  # Set as needed
+        self.tableCards = [self.flop1, self.flop2, self.flop3, self.turn, self.river]  # Adjust as necessary
+        self.lastWinners = []  # Adjust as necessary
+        self.playerQueue = []  # Adjust as necessary
+        self.active = data['active']
+        self.blinds = data['blinds']
+        self.flip = data['flip']
+        self.bombPot = data['bombPot']
+        self.Time = data['Time']
 
     def reset(self, big, small, *players):
         """

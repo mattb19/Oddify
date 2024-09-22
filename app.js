@@ -4,6 +4,7 @@ const session = require('express-session');
 const http = require('http');
 const socketIo = require('socket.io');
 const { exec } = require('child_process');
+const { type } = require('os');
 
 const app = express();
 const server = http.createServer(app);
@@ -31,7 +32,8 @@ async function initializeGame() {
             if (error) {
                 return reject(`Error: ${stderr}`);
             }
-            resolve(stdout.trim());
+            resolve(JSON.parse(stdout));
+            console.log("Initialized!")
         });
     });
 }
@@ -39,29 +41,24 @@ async function initializeGame() {
 // This function handles the python script which adds a player move to the game
 function handleBet(inputGame, inputBet) {
     return new Promise((resolve, reject) => {
-        const input = JSON.stringify(inputGame);
         const process = exec(`python handleBet.py "${inputBet}"`, { shell: true });
-
-        console.log(inputBet);
-
-        // Send the input JSON object to the Python script
-        process.stdin.write(input);
-        process.stdin.end();
 
         let output = '';
         let errorOutput = '';
+
         process.stdout.on('data', (data) => {
             output += data;
         });
 
         process.stderr.on('data', (data) => {
             errorOutput += data; // Accumulate error data
-            console.log(errorOutput);
+            console.error(`Error Output: ${data}`); // Log immediately
         });
 
         process.on('close', (code) => {
             if (code !== 0) {
-                return reject(`Process exited with code: ${code}\nError Output: ${errorOutput}`);
+                console.error(`Process exited with code: ${code}\nError Output: ${errorOutput}`);
+                return reject(new Error(`Error in Python script: ${errorOutput}`));
             }
             try {
                 resolve(JSON.parse(output));
@@ -70,9 +67,9 @@ function handleBet(inputGame, inputBet) {
             }
         });
 
-        process.stderr.on('data', (data) => {
-            reject(`Error: ${data}`);
-        });
+        // Send the input JSON object to the Python script
+        process.stdin.write(JSON.stringify(inputGame));
+        process.stdin.end();
     });
 }
 
@@ -116,6 +113,7 @@ io.on('connection', (socket) => {
 
         try {
             const updatedGame = await bet(action);
+            global.game = updatedGame;
             io.emit('updateInfo', updatedGame); // Emit the updated game state
         } catch (error) {
             console.error('Error handling bet:', error);

@@ -319,13 +319,8 @@ body, html {
     border-radius: 15px; /* Optional: round corners */
 }
 
-.actionButton span {
-    transition: all 200ms;
-}
 
-.actionButton:hover span {
-    opacity: .6;
-}
+
 
 
 

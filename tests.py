@@ -12,10 +12,7 @@ game.placeBetFold(20)
 print(f"Current Bet: {game.currentBet}")
 print(f"Current Player: {game.players[game.currentPlayer].user}")
 
-pot = game.pot
-print(pot)
-game.placeBetFold(20)
-print(game.pot)
+print(game.json())
 
 # class TestPlayer():
 #     def __init__(self, user, handWorth, totalValue) -> None:
