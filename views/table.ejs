@@ -23,26 +23,43 @@
         <div class="currentBet" id="currentBetAmount">Current Bet: 20</div>
     </div>
     <div class="custom-slider-container">
-        <input type="range" class="custom-slider" min="0" max="1000" value="50" oninput="rangeValue.innerText = this.value">
-        <button class="actionButton" id="customBets"><span><p id="rangeValue">50</p></span></button>
+        <input type="range" class="custom-slider" min="0" max="1000" value="50" oninput="rangeValue.innerText = this.value" id="rV">
+        <button class="actionButton" id="customBets" onclick="action(document.getElementById('rangeValue').innerText)"><span><p id="rangeValue">50</p></span></button>
     </div>
     <div class="customBetContainer">
         <div class="buttonContainer" id="buttonContainer">
-            <button class="actionButton" id="customBets" onclick="action(-1)"><span><p id="cVal">20</p></span></button>
-            <button class="actionButton" id="customBets" onclick="action('CALL')"><span><p id="cVal">40</p></span></button>
-            <button class="actionButton" id="customBets" onclick="showBetSlider()"><span><p id="cVal">200</p></span></button>
-            <button class="actionButton" id="customBets" onclick="showBetSlider()"><span><p id="cVal">ALL IN</p></span></button>
+            <button class="actionButton" id="customBets" onclick="rangeValue.innerText = document.getElementById('cVal0').innerText;
+                                                                  document.getElementById('rV').value=document.getElementById('cVal0').innerText">
+                <span><p id="cVal0">20</p></span>
+            </button>
+            <button class="actionButton" id="customBets" onclick="rangeValue.innerText = document.getElementById('cVal1').innerText;
+                                                                  document.getElementById('rV').value=document.getElementById('cVal1').innerText">
+                <span><p id="cVal1">40</p></span>
+            </button>
+            <button class="actionButton" id="customBets" onclick="rangeValue.innerText = document.getElementById('cVal2').innerText;
+                                                                  document.getElementById('rV').value=document.getElementById('cVal2').innerText">
+                <span><p id="cVal2">200</p></span>
+            </button>
+            <button class="actionButton" id="customBets" onclick="rangeValue.innerText = document.getElementById('rV').max;
+                                                                  document.getElementById('rV').value = document.getElementById('rV').max">
+                <span><p id="cVal3">ALL IN</p></span>
+            </button>
         </div>
     </div>
     <div class="actionContainer">
-        <div class="buttonContainer" id="buttonContainer">
-            <button class="actionButton" id="fold" onclick="action(-1)"><span>FOLD</span></button>
-            <button class="actionButton" id="call" onclick="action('CALL')"><span>CALL</span></button>
+        <div class="buttonContainer" id="player00">
+            <button class="actionButton" id="fold" onclick="action('FOLD')"><span>FOLD</span></button>
+            <button class="actionButton" id="call" onclick="action('CALL')"><span id="checkCall">CALL</span></button>
             <button class="actionButton" id="bet" onclick="showBetSlider()"><span>BET</span></button>
         </div>
     </div>
     <div class="tableContainer">
         <div class="playerContainer">
+            <div class="playerSlot" id="player0">
+                <div class="playerName" id="player0Name">YOU</div>
+                <img src="images/general/yuhfar.png" class="profilePicture">
+                <div class="playerChipCount" id="player0ChipCount">100</div>
+            </div>
             <div class="playerSlot" id="player1">
                 <div class="playerCardContainer" style="top: 3vh;left: 5vw;">
                     <img src="images/poker cards/None_of_None.png" class="playerCard1" id="p1c1">
@@ -132,8 +149,8 @@
     </div>
     <div class="username" id="welcomeMessage">
         <script>
-            const username = '<%= username %>'; // Use EJS syntax to access the session variable
-            document.write(`Welcome, ${username}`);
+            window.uname = '<%= username %>'; // Use EJS syntax to access the session variable
+            document.write(`Welcome, ${window.uname}`);
         </script>
     </div>
 </body>

@@ -136,6 +136,7 @@ body, html {
 
 
 /* Positioning the player slots */
+#player0 { top: 75.35vh; left: 62.5vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
 #player1 { top: 68vh; left: 20vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
 #player2 { top: 45vh; left: 15.5vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
 #player3 { top: 22vh; left: 20vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
@@ -252,7 +253,7 @@ body, html {
     font-size: 1.2vw;
     cursor: pointer;
     color: rgb(0, 0, 0); /* Change the font color to white */
-    background-color: rgba(255, 255, 255, 0.836); /* Optional: background color */
+    background-color: rgb(255, 255, 255); /* Optional: background color */
     border: none; /* Remove default button border */
     border-radius: 0.5vw; /* Optional: round corners */
     font-family: "Tahoma", sans-serif;
@@ -386,7 +387,7 @@ body, html {
     padding: 0; /* Remove padding for better centering */
     font-size: 0.7vw; 
     color: rgb(0, 0, 0); /* Change the font color to black */
-    background-color: rgba(255, 255, 255, 0.836); /* Optional: background color */
+    background-color: rgb(255, 255, 255); /* Optional: background color */
     border: none; /* Remove default button border */
     border-radius: 0.5vh;
     margin: 0; /* Remove negative margin */
@@ -397,7 +398,19 @@ body, html {
     align-items: center; /* Center text vertically */
 }
 
-#cVal {
+#cVal0 {
+    transform: translate(-50%, -50%);
+    position: absolute;
+}
+#cVal1 {
+    transform: translate(-50%, -50%);
+    position: absolute;
+}
+#cVal2 {
+    transform: translate(-50%, -50%);
+    position: absolute;
+}
+#cVal3 {
     transform: translate(-50%, -50%);
     position: absolute;
 }

@@ -261,7 +261,7 @@ class Game:
             
         elif value + player.getCurrentBet() < self.currentBet:
             # Not enough to call or raise
-            raise ValueError("You must put more in to call or raise")
+            raise ValueError("Bet not high enough")
         
         elif value > player.getChipCount():
             # Insufficient funds

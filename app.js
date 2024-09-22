@@ -109,8 +109,8 @@ io.on('connection', (socket) => {
 
     // Handle action button event, used to be on('call')
     socket.on('action', async (data) => {
-        const action = data.buttonId
-
+        const action = data.dataString;
+        console.log(`Data received: ${action}`);
         try {
             const updatedGame = await bet(action);
             global.game = updatedGame;
