@@ -8,7 +8,7 @@ from copy import deepcopy
 from itertools import groupby
 
 class Game:
-    def __init__(self, gameID=0, players=[], smallBlind=10, bigBlind=20, deck=None, pot=0, currentBet=0, round=0, currentPlayer=None, tableCards=None, 
+    def __init__(self, gameID=0, players=[], smallBlind=10, bigBlind=20, deck=None, pot=0, currentBet=0, round=0, currentPlayer=None, 
                  lastWinners=None, playerQueue=None, active=False, blinds=None, flip=True, bombPot=False, 
                  flop1=None, flop2=None, flop3=None, turn=None, river=None, Time=0) -> None:
         """
@@ -24,7 +24,6 @@ class Game:
             currentBet (int, optional): Current bet amount. Defaults to 0.
             round (int, optional): The current round number. Defaults to 0.
             currentPlayer (Player, optional): The player whose turn it is. Defaults to None.
-            tableCards (list of Card, optional): Cards on the table. Defaults to an empty list.
             lastWinners (list of Player, optional): List of last winners. Defaults to an empty list.
             playerQueue (list of Player, optional): Queue of players. Defaults to an empty list.
             active (bool, optional): Whether the game is active. Defaults to False.
@@ -45,7 +44,6 @@ class Game:
         self.currentBet = currentBet
         self.round = round
         self.currentPlayer = currentPlayer
-        self.tableCards = tableCards if tableCards is not None else []
         self.lastWinners = lastWinners if lastWinners is not None else []
         self.playerQueue = playerQueue if playerQueue is not None else []
         self.active = active
@@ -115,7 +113,6 @@ class Game:
         self.round = 0
         self.pot = 0
         self.lastWinners = []
-        self.tableCards = []
 
         # Set player hands worth to 0
         for player in self.players:
@@ -160,14 +157,13 @@ class Game:
         self.dealCards()
 
         # Determine flop, turn, and river cards
-        self.tableCards = [self.deck.pop() for _ in range(5)]
+        self.flop1 = self.deck.pop()
+        self.flop2 = self.deck.pop()
+        self.flop3 = self.deck.pop()
+        self.turn = self.deck.pop()
+        self.river = self.deck.pop()
         
-        # Setting table cards
-        self.flop1 = self.tableCards[0]
-        self.flop2 = self.tableCards[1]
-        self.flop3 = self.tableCards[2]
-        self.turn = self.tableCards[3]
-        self.river = self.tableCards[4]
+        self.deck = []
 
         # Set current player to the one after the big blind
         self.setCurrentPlayer()
@@ -553,9 +549,6 @@ class Game:
     
     def getPlayerCountInt(self):
         return len(self.players)
-    
-    def setTableCards(self):
-        self.tableCards = [i for i in self.tableCards]
 
     def setGameID(self, gameID):
         self.gameID = gameID
@@ -630,7 +623,6 @@ class Game:
             'currentBet': self.currentBet,
             'round': self.round,
             'currentPlayer': self.currentPlayer,
-            'tableCards': [serialize_card(card) for card in self.tableCards],
             'lastWinners': [winner.user for winner in self.lastWinners],
             'playerQueue': [player.user for player in self.playerQueue],
             'active': self.active,
@@ -683,13 +675,6 @@ class Game:
             )
             self.players.append(player)
 
-        # Create Card objects for flop, turn, and river
-        # self.flop1 = Card(data['tableCards'][0]['_suit'], data['tableCards'][0]['_num'], data['tableCards'][0]['_value'])
-        # self.flop2 = Card(data['tableCards'][1]['_suit'], data['tableCards'][1]['_num'], data['tableCards'][1]['_value'])
-        # self.flop3 = Card(data['tableCards'][2]['_suit'], data['tableCards'][2]['_num'], data['tableCards'][2]['_value'])
-        # self.turn = Card(data['tableCards'][3]['_suit'], data['tableCards'][3]['_num'], data['tableCards'][4]['_value'])
-        # self.river = Card(data['tableCards'][4]['_suit'], data['tableCards'][4]['_num'], data['tableCards'][4]['_value'])
-
         self.flop1 = Card(data['flop1']['_suit'], data['flop1']['_num'], data['flop1']['_value'])
         self.flop2 = Card(data['flop2']['_suit'], data['flop2']['_num'], data['flop2']['_value'])
         self.flop3 = Card(data['flop3']['_suit'], data['flop3']['_num'], data['flop3']['_value'])
@@ -704,7 +689,6 @@ class Game:
         self.currentBet = data['currentBet']
         self.round = data['round']
         self.currentPlayer = data['currentPlayer']  # Set as needed
-        self.tableCards = [self.flop1, self.flop2, self.flop3, self.turn, self.river]  # Adjust as necessary
         self.lastWinners = []  # Adjust as necessary
         self.playerQueue = []  # Adjust as necessary
         self.active = data['active']
@@ -730,7 +714,6 @@ class Game:
         self.currentBet = 0
         self.round = 0
         self.currentPlayer = 0
-        self.tableCards = []
         self.lastWinners = []
         self.playerQueue = []
         self.active = True

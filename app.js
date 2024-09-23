@@ -4,7 +4,6 @@ const session = require('express-session');
 const http = require('http');
 const socketIo = require('socket.io');
 const { exec } = require('child_process');
-const { type } = require('os');
 
 const app = express();
 const server = http.createServer(app);
@@ -104,8 +103,8 @@ app.get('/poker', (req, res) => {
 // Handle socket connections
 io.on('connection', (socket) => {
     console.log('A user connected');
-
-    socket.emit('updateInfo', game);
+    
+    socket.emit('updateInfo', modifyGame(game));
 
     // Handle action button event, used to be on('call')
     socket.on('action', async (data) => {
@@ -114,7 +113,7 @@ io.on('connection', (socket) => {
         try {
             const updatedGame = await bet(action);
             global.game = updatedGame;
-            io.emit('updateInfo', updatedGame); // Emit the updated game state
+            io.emit('updateInfo', modifyGame(updatedGame)); // Emit the updated game state
         } catch (error) {
             console.error('Error handling bet:', error);
             socket.emit('error', 'Could not process bet.'); // Optional: Send error to client
@@ -138,3 +137,41 @@ io.on('connection', (socket) => {
         console.error('Error initializing game:', error);
     }
 })();
+
+// Modifying the game to only include what is needed to the client
+function modifyGame(game) {
+    let updatedGame = JSON.parse(JSON.stringify(game));
+
+    let flop1 = updatedGame.flop1;
+    let flop2 = updatedGame.flop2;
+    let flop3 = updatedGame.flop3;
+    let turn = updatedGame.turn;
+    let river = updatedGame.river;
+
+    // Helper function to reset card properties
+    function resetCard(card) {
+        card._suit = 'None';
+        card._num = 'None';
+        card._value = null;
+    }
+
+    // Reset flop, turn, and river depending on the round
+    if (updatedGame.round == 0) {
+        // Reset all cards for round 0
+        resetCard(flop1);
+        resetCard(flop2);
+        resetCard(flop3);
+        resetCard(turn);
+        resetCard(river);
+    } else if (updatedGame.round == 1) {
+        // Reset flop cards for round 1 (flop)
+        resetCard(turn);
+        resetCard(river);
+    } else if (updatedGame.round == 2) {
+        // Reset turn card for round 2 (turn)
+        resetCard(river);
+    }
+    // Return the modified copy of the game
+    return updatedGame;
+}
+
