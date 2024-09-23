@@ -13,9 +13,10 @@ function moveBetVal() {
 
 ///////////////////// Handle web socket Dynamic Updating /////////////////////
 const socket = io();
+const gameID = window.location.hash.substring(1);
+const username = window.uname;
 
-// Emit username when connecting
-socket.emit('register', { username: '<%= username %>' });
+socket.emit('joinGame', gameID, username);
 
 // Listen for updates to pot and current bet
 socket.on('updateInfo', (game) => {
@@ -35,9 +36,6 @@ socket.on('updateInfo', (game) => {
             return; // Exit if parsing fails
         }
     }
-
-    const username = 'Ryan';
-    // use window.uname to get current username
 
     console.log('Received game object: ', game);
 
@@ -187,5 +185,5 @@ function action(data) {
     const dataString = data;
     console.log(`Sending bet: ${dataString}`);
     // Emit the "action" (used to be "call") event to the server when the button is clicked
-    socket.emit('action', { dataString });
+    socket.emit('action', { dataString }, { gameID });
 }

@@ -4,6 +4,7 @@ const session = require('express-session');
 const http = require('http');
 const socketIo = require('socket.io');
 const { exec } = require('child_process');
+const { name } = require('ejs');
 
 const app = express();
 const server = http.createServer(app);
@@ -97,23 +98,61 @@ app.post('/login', (req, res) => {
 
 // Rendering poker table with ejs template
 app.get('/poker', (req, res) => {
-    res.render('table', { username: req.session.username || 'Guest' });
+    const gameId = req.query.gameId || '0'; // Set a default game ID if needed
+    res.render('table', { username: req.session.username || 'Guest', gameId  });
 });
 
+const players = {};
 // Handle socket connections
 io.on('connection', (socket) => {
-    console.log('A user connected');
-    
-    socket.emit('updateInfo', modifyGame(game));
+
+    // Getting gameID they joined
+    socket.on('joinGame', (gameId, username) => {
+        // Making the user leave any previous rooms they were in
+        if (socket.gameId) {
+            socket.leave(socket.gameId);
+            console.log(`${username} left room: ${socket.gameId}`);
+        }
+
+        // Joining the new game room
+        socket.join(gameId);
+        socket.gameId = gameId;
+        console.log(`${username} joined room: ${gameId}`);
+
+        players[socket.id] = {      // to be replaced with sql later
+            socketId: socket.id,
+            gameId: gameId,
+            username: username
+        }
+        console.log(socket.id)
+        
+        // Here we add the playerId to the player in the game object (to be replace with sql later)
+        const nameList = global.game.players.map(player => player.user);
+        const userIndex = nameList.indexOf(username);
+        global.game.players[userIndex].playerId = socket.id;
+        
+        socket.emit('updateInfo', modifyGame(global.game, socket.id)); // This specifically targets the socket
+    });
 
     // Handle action button event, used to be on('call')
-    socket.on('action', async (data) => {
+    socket.on('action', async (data, gameId) => {
+        const id = gameId.gameId;
         const action = data.dataString;
         console.log(`Data received: ${action}`);
+    
         try {
             const updatedGame = await bet(action);
             global.game = updatedGame;
-            io.emit('updateInfo', modifyGame(updatedGame)); // Emit the updated game state
+            
+            // Getting a list of all players in the game (to be replaced with SQL)
+            const playersInGame = Object.values(players).filter(player => player.gameId === '3');
+            
+            // Sending the players the game object with only their cards
+            for (const player of playersInGame) {
+                const userGame = modifyGame(updatedGame, player.socketId);
+                io.to(player.socketId).emit('updateInfo', userGame); // Emit to specific socketId
+            }
+
         } catch (error) {
             console.error('Error handling bet:', error);
             socket.emit('error', 'Could not process bet.'); // Optional: Send error to client
@@ -121,7 +160,8 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        console.log('A user disconnected');
+        console.log(`A user disconnected from room: ${socket.gameId}`);
+        delete players[socket.id]; // to be replaced with sql later
     });
 });
 
@@ -139,7 +179,7 @@ io.on('connection', (socket) => {
 })();
 
 // Modifying the game to only include what is needed to the client
-function modifyGame(game) {
+function modifyTableCards(game) {
     let updatedGame = JSON.parse(JSON.stringify(game));
 
     let flop1 = updatedGame.flop1;
@@ -172,6 +212,25 @@ function modifyGame(game) {
         resetCard(river);
     }
     // Return the modified copy of the game
+    return updatedGame;
+}
+
+// Modify the game by specific player, only sending them their own cards
+function modifyGame(game, playerId) {
+    const updatedGame = modifyTableCards(game);
+
+    function resetCard(card) {
+        card._suit = 'None';
+        card._num = 'None';
+        card._value = null;
+    }
+
+    for (const i of updatedGame.players) {
+        if (i.playerId !== playerId) {
+            resetCard(i.card1);
+            resetCard(i.card2);
+        }
+    }
     return updatedGame;
 }
 

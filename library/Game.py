@@ -8,14 +8,14 @@ from copy import deepcopy
 from itertools import groupby
 
 class Game:
-    def __init__(self, gameID=0, players=[], smallBlind=10, bigBlind=20, deck=None, pot=0, currentBet=0, round=0, currentPlayer=None, 
+    def __init__(self, gameID="0", players=[], smallBlind=10, bigBlind=20, deck=None, pot=0, currentBet=0, round=0, currentPlayer=None, 
                  lastWinners=None, playerQueue=None, active=False, blinds=None, flip=True, bombPot=False, 
                  flop1=None, flop2=None, flop3=None, turn=None, river=None, Time=0) -> None:
         """
         Initializes a new game instance with the provided parameters.
 
         Args:
-            gameID (int): Unique identifier for the game.
+            gameID (str): Unique base62 identifier for the game.
             players (list of Player): List of players participating in the game.
             smallBlind (int): Amount for the small blind.
             bigBlind (int): Amount for the big blind.
@@ -612,7 +612,8 @@ class Game:
                 'allIn': player.allIn,
                 'spectate': player.spectate,
                 'muck': player.muck,
-                'totalValue': player.totalValue
+                'totalValue': player.totalValue,
+                'playerId': player.playerId
             }
 
         game_data = {
@@ -660,6 +661,7 @@ class Game:
             )
 
             player = Player(
+                playerId=player_data['playerId'],
                 user=player_data['user'],
                 card1=card1,
                 card2=card2,
