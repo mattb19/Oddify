@@ -326,11 +326,6 @@ class Game:
         
         # If all players have called, checked, or folded
         if True not in turns:
-            # If it's the first round and there was a bomb pot, reset it
-            if self.bombPot and self.round == 0:
-                self.bombPot = False
-                time.sleep(5)  # Delay for UI updates
-                
             # Find the index of the player who posted the blind
             l = [i.getBlind() for i in self.players]
             blindIndex = l.index(1)
@@ -437,7 +432,7 @@ class Game:
             player.setCurrentBetZero()
             player.setHandWorthZero()
             
-        return winnings
+        self.newRound()
 
     def split_pot(self, winners):
         """
@@ -714,11 +709,11 @@ class Game:
             self.players.append(player)
 
         # Create Card objects for flop, turn, and river
-        self.flop1 = Card(data['flop1']['_suit'], data['flop1']['_num'], data['flop1']['_value'])
-        self.flop2 = Card(data['flop2']['_suit'], data['flop2']['_num'], data['flop2']['_value'])
-        self.flop3 = Card(data['flop3']['_suit'], data['flop3']['_num'], data['flop3']['_value'])
-        self.turn = Card(data['turn']['_suit'], data['turn']['_num'], data['turn']['_value'])
-        self.river = Card(data['river']['_suit'], data['river']['_num'], data['river']['_value'])
+        self.flop1 = Card(data['tableCards'][0]['_suit'], data['tableCards'][0]['_num'], data['tableCards'][0]['_value'])
+        self.flop2 = Card(data['tableCards'][1]['_suit'], data['tableCards'][1]['_num'], data['tableCards'][1]['_value'])
+        self.flop3 = Card(data['tableCards'][2]['_suit'], data['tableCards'][2]['_num'], data['tableCards'][2]['_value'])
+        self.turn = Card(data['tableCards'][3]['_suit'], data['tableCards'][3]['_num'], data['tableCards'][4]['_value'])
+        self.river = Card(data['tableCards'][4]['_suit'], data['tableCards'][4]['_num'], data['tableCards'][4]['_value'])
 
         # Set other attributes
         self.gameID = data['gameID']

@@ -67,10 +67,39 @@ socket.on('updateInfo', (game) => {
         rotatePlayers = game.players.slice(userIndex).concat(game.players.slice(0, userIndex));
     }
     const newNameList = rotatePlayers.map(player => player.user);
-    const currentPlayer = newNameList.indexOf(currentPlayerName)
-    const userPlayer = rot
-    if (username == currentPlayerName && game.currentBet == ) {}
+    const currentPlayer = newNameList.indexOf(currentPlayerName);
+    const userPlayer = rotatePlayers[newNameList.indexOf(username)];
 
+    // Making users cards visible
+    const card1Element = document.getElementById('userCard1');
+    const card2Element = document.getElementById('userCard2');
+    const card1 = userPlayer.card1;
+    const card2 = userPlayer.card2;
+    const card1SRC = `images/poker cards/${card1._num}_of_${card1._suit.toLowerCase()}.png`;
+    const card2SRC = `images/poker cards/${card2._num}_of_${card2._suit.toLowerCase()}.png`;
+    console.log (card1SRC);
+    card1Element.src = card1SRC;
+    card2Element.src = card2SRC;
+
+    // Changing check/call button as needed for user
+    if (game.currentBet == userPlayer.currentBet) {
+        document.getElementById('checkCall').innerText = 'CHECK';
+    }
+    else if (game.currentBet > userPlayer.currentBet) {
+        document.getElementById('checkCall').innerText = 'CALL';
+    }
+
+    // Setting active marker on betting buttons if its users turn
+    betButtonElement = document.getElementById('player00');
+    if (currentPlayer == newNameList.indexOf(username)) {
+        betButtonElement.style.backgroundColor = "rgba(21, 255, 0, 0.849)";
+        betButtonElement.style.animation = "expandButtons 2s infinite";
+    } else {
+        betButtonElement.style.backgroundColor = "rgba(0, 0, 0, 0.849)";
+        betButtonElement.style.animation = "None";
+    }
+
+    // Handling update info for all other players
     for (let i = 0; i < 9; i++) {
         const playerSlot = document.getElementById(`player${i}`);
         if (playerSlot) {
@@ -82,12 +111,33 @@ socket.on('updateInfo', (game) => {
                 const playerChips = document.getElementById(`player${i}ChipCount`);
                 playerChips.innerText = `${rotatePlayers[i].chipCount} chips`
 
+                // Set each players cards
+                if (game.round == 4 && rotatePlayers[i].currentBet !== null){
+                    const card1Element = document.getElementById(`p${i}c1`);
+                    const card2Element = document.getElementById(`p${i}c2`);
+                    const card1 = rotatePlayers[i].card1;
+                    const card2 = rotatePlayers[i].card2;
+                    const card1SRC = `images/poker cards/${card1._num}_of_${card1._suit.toLowerCase()}.png`;
+                    const card2SRC = `images/poker cards/${card2._num}_of_${card2._suit.toLowerCase()}.png`;
+                    card1Element.src = card1SRC;
+                    card2Element.src = card2SRC;
+                }
+                
+                // Setting turn indicator for whoevers turn it is
                 if (i === currentPlayer) {
                     playerSlot.style.backgroundColor = "rgba(21, 255, 0, 0.849)";
                     playerSlot.style.animation = "expandButtons 2s infinite";
                 } else {
                     playerSlot.style.backgroundColor = "rgba(0, 0, 0, 0.849)";
                     playerSlot.style.animation = "None";
+                }
+                
+                // Removing folded players cards
+                if (rotatePlayers[i].currentBet == null) {
+                    const card1Element = document.getElementById(`p${i}c1`);
+                    const card2Element = document.getElementById(`p${i}c2`);
+                    card1Element.style.animation = "fold1 0.5s forwards ease"
+                    card2Element.style.animation = "fold2 0.5s forwards ease"
                 }
 
 
@@ -97,6 +147,13 @@ socket.on('updateInfo', (game) => {
             }
         }
     }
+
+    // Setting table cards
+    
+
+
+    // Changing users name to "YOU"
+    document.getElementById('player0Name').innerText = 'YOU'
 });
 
 /**
