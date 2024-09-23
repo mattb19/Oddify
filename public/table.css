@@ -92,7 +92,6 @@ body, html {
     flex-direction: column; /* Stack items vertically */
     justify-content: center; /* Center horizontally */
     align-items: center; /* Center vertically */
-    /* animation: expandButtons 2s infinite; */
 }
 
 .profilePicture{
@@ -156,6 +155,15 @@ body, html {
         opacity: 0;
         left: -4vw;
         transform: rotate(100deg);
+    }
+}
+
+@keyframes out {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.3;
     }
 }
 

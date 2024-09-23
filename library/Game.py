@@ -109,6 +109,7 @@ class Game:
         self.shuffleDeck()
         self.players = [player for player in self.players if not player.getSpectate()] + self.playerQueue
         self.playerQueue = []
+        self.players = [player for player in self.players if player.getChipCount() > 0]
 
         # Reset round and game status
         self.round = 0
@@ -155,14 +156,18 @@ class Game:
 
         self.currentBet = self.bigBlind
 
-        # Set table cards to face down
-        self.flop1 = self.flop2 = self.flop3 = self.turn = self.river = Card("None", "None", 0)
-
         # Deal new cards to players
         self.dealCards()
 
         # Determine flop, turn, and river cards
         self.tableCards = [self.deck.pop() for _ in range(5)]
+        
+        # Setting table cards
+        self.flop1 = self.tableCards[0]
+        self.flop2 = self.tableCards[1]
+        self.flop3 = self.tableCards[2]
+        self.turn = self.tableCards[3]
+        self.river = self.tableCards[4]
 
         # Set current player to the one after the big blind
         self.setCurrentPlayer()
@@ -229,12 +234,12 @@ class Game:
             player.setTurn(False)
             result = f"{player.user} Checks!"
         
-        elif value == self.currentBet and value < player.getChipCount():
+        elif value <= self.currentBet and value < player.getChipCount():
             # Player calls
             player.setTotalValue(player.getTotalValue()+(value - player.getCurrentBet()))
-            player.setChipCount(player.getChipCount()-(value - player.getCurrentBet()))
+            player.setChipCount(player.getChipCount()-(self.currentBet - player.getCurrentBet()))
             player.setTurn(False)
-            self.pot += value - player.getCurrentBet()
+            self.pot += self.currentBet - player.getCurrentBet()
             player.setCurrentBet(self.currentBet)
             result = f"{player.user} calls {value}! Pot is now {self.pot}!"
         
@@ -248,7 +253,7 @@ class Game:
             player.setCurrentBet(self.currentBet)
             result = f"{player.user} raises {value}! Pot is now {self.pot}!"
         
-        elif value - player.getCurrentBet() == player.getChipCount():
+        elif value - player.getCurrentBet() >= player.getChipCount():
             # Player goes all-in
             player.setTotalValue(player.getTotalValue()+(value - player.getCurrentBet()))
             player.setChipCount(0)
@@ -262,10 +267,6 @@ class Game:
         elif value + player.getCurrentBet() < self.currentBet:
             # Not enough to call or raise
             raise ValueError("Bet not high enough")
-        
-        elif value > player.getChipCount():
-            # Insufficient funds
-            raise ValueError("Insufficient Funds")
         
         # Set turns for remaining players
         for p in self.players:
@@ -303,26 +304,18 @@ class Game:
         if (len(allinPlayers) == len(nonFolded)) or (len(allinPlayers) + 1 == len(nonFolded) and True not in turns):
             while self.round < 4:
                 if self.round == 0: #If Pre Flop
-                    # Deal the flop (first three community cards)
-                    self.flop1 = self.tableCards[0]
-                    self.flop2 = self.tableCards[1]
-                    self.flop3 = self.tableCards[2]
                     self.round = 1  # Move to the next round
                     
                 if self.round == 1: # If Flop
-                    # Deal the turn (fourth community card)
-                    self.turn = self.tableCards[3]
                     self.round += 1
                     
                 if self.round == 2: # If Turn
-                    # Deal the river (fifth community card)
-                    self.river = self.tableCards[4]
                     self.round += 1
                     
                 if self.round == 3: # If River
                     # End the current round
                     self.round = 4
-                    return self.endRound()
+                    return self.endHand()
         
         # If all players have called, checked, or folded
         if True not in turns:
@@ -342,16 +335,6 @@ class Game:
             # Update the current player and reset current bet
             self.currentPlayer = c
             self.currentBet = 0
-
-            # Deal community cards based on the round
-            if self.round == 0:
-                self.flop1 = self.tableCards[0]
-                self.flop2 = self.tableCards[1]
-                self.flop3 = self.tableCards[2]
-            elif self.round == 1:
-                self.turn = self.tableCards[3]
-            elif self.round == 2:
-                self.river = self.tableCards[4]
             
             # If it's the last rotation, end the round
             if self.round == 3:
@@ -363,14 +346,6 @@ class Game:
                 return self.endHand()
 
             self.round += 1  # Move to the next round
-            
-            # Output the stage of the game
-            if self.round == 1:
-                result = "============= FLOP ============="
-            elif self.round == 2:
-                result = "============= TURN ============="
-            elif self.round == 3:
-                result = "============= RIVER ============="
 
             # Reset current bets for players who are not all-in or spectating
             for i in self.players:
@@ -379,7 +354,7 @@ class Game:
                     i.setTurn(True)
                 elif i.getAllIn():
                     i.setCurrentBetZero()
-            return result
+            return "SUCCESS"
         
         # Determine who's turn is next
         counter = self.currentPlayer
@@ -405,8 +380,8 @@ class Game:
         
         # Evaluate each player's hand
         for player in self.players:
-            cards = [self.tableCards[0], self.tableCards[1], self.tableCards[2], 
-                    self.tableCards[3], self.tableCards[4], player.getCard1(), player.getCard2()]
+            cards = [self.flop1, self.flop2, self.flop3, self.turn,
+                     self.river, player.getCard1(), player.getCard2()]
             
             # Check hand strength and update player's hand worth
             hand_functions = [
@@ -709,11 +684,17 @@ class Game:
             self.players.append(player)
 
         # Create Card objects for flop, turn, and river
-        self.flop1 = Card(data['tableCards'][0]['_suit'], data['tableCards'][0]['_num'], data['tableCards'][0]['_value'])
-        self.flop2 = Card(data['tableCards'][1]['_suit'], data['tableCards'][1]['_num'], data['tableCards'][1]['_value'])
-        self.flop3 = Card(data['tableCards'][2]['_suit'], data['tableCards'][2]['_num'], data['tableCards'][2]['_value'])
-        self.turn = Card(data['tableCards'][3]['_suit'], data['tableCards'][3]['_num'], data['tableCards'][4]['_value'])
-        self.river = Card(data['tableCards'][4]['_suit'], data['tableCards'][4]['_num'], data['tableCards'][4]['_value'])
+        # self.flop1 = Card(data['tableCards'][0]['_suit'], data['tableCards'][0]['_num'], data['tableCards'][0]['_value'])
+        # self.flop2 = Card(data['tableCards'][1]['_suit'], data['tableCards'][1]['_num'], data['tableCards'][1]['_value'])
+        # self.flop3 = Card(data['tableCards'][2]['_suit'], data['tableCards'][2]['_num'], data['tableCards'][2]['_value'])
+        # self.turn = Card(data['tableCards'][3]['_suit'], data['tableCards'][3]['_num'], data['tableCards'][4]['_value'])
+        # self.river = Card(data['tableCards'][4]['_suit'], data['tableCards'][4]['_num'], data['tableCards'][4]['_value'])
+
+        self.flop1 = Card(data['flop1']['_suit'], data['flop1']['_num'], data['flop1']['_value'])
+        self.flop2 = Card(data['flop2']['_suit'], data['flop2']['_num'], data['flop2']['_value'])
+        self.flop3 = Card(data['flop3']['_suit'], data['flop3']['_num'], data['flop3']['_value'])
+        self.turn = Card(data['turn']['_suit'], data['turn']['_num'], data['turn']['_value'])
+        self.river = Card(data['river']['_suit'], data['river']['_num'], data['river']['_value'])
 
         # Set other attributes
         self.gameID = data['gameID']

@@ -77,7 +77,6 @@ socket.on('updateInfo', (game) => {
     const card2 = userPlayer.card2;
     const card1SRC = `images/poker cards/${card1._num}_of_${card1._suit.toLowerCase()}.png`;
     const card2SRC = `images/poker cards/${card2._num}_of_${card2._suit.toLowerCase()}.png`;
-    console.log (card1SRC);
     card1Element.src = card1SRC;
     card2Element.src = card2SRC;
 
@@ -98,6 +97,18 @@ socket.on('updateInfo', (game) => {
         betButtonElement.style.backgroundColor = "rgba(0, 0, 0, 0.849)";
         betButtonElement.style.animation = "None";
     }
+
+    if (userPlayer.currentBet === null) {
+        card1Element.style.animation = "out 0.5s forwards";
+        card2Element.style.animation = "out 0.5s forwards";
+    } else {
+        card1Element.style.animation = "";
+        card2Element.style.animation = "";
+    }
+
+    // Setting bet slider max to users chip count
+    const userChipCount = userPlayer.chipCount;
+    document.getElementById('rV').max = userChipCount;
 
     // Handling update info for all other players
     for (let i = 0; i < 9; i++) {
@@ -132,15 +143,18 @@ socket.on('updateInfo', (game) => {
                     playerSlot.style.animation = "None";
                 }
                 
-                // Removing folded players cards
+                // Removing folded players cards and fading them out
+                const card1Element = document.getElementById(`p${i}c1`);
+                const card2Element = document.getElementById(`p${i}c2`);
                 if (rotatePlayers[i].currentBet == null) {
-                    const card1Element = document.getElementById(`p${i}c1`);
-                    const card2Element = document.getElementById(`p${i}c2`);
-                    card1Element.style.animation = "fold1 0.5s forwards ease"
-                    card2Element.style.animation = "fold2 0.5s forwards ease"
+                    card1Element.style.animation = "fold1 0.5s forwards ease";
+                    card2Element.style.animation = "fold2 0.5s forwards ease";
+                    playerSlot.style.animation = "out 0.5s forwards";
+                } else {
+                    playerSlot.style.opacity = "1";
+                    card1Element.style.animation = "";
+                    card2Element.style.animation = "";
                 }
-
-
 
             } else {
                 playerSlot.style.display = 'none'; // Hide unused player slots
@@ -149,7 +163,16 @@ socket.on('updateInfo', (game) => {
     }
 
     // Setting table cards
-    
+    const flop1Element = document.getElementById('flop1');
+    const flop2Element = document.getElementById('flop2');
+    const flop3Element = document.getElementById('flop3');
+    const turnElement = document.getElementById('turn');
+    const riverElement = document.getElementById('river');
+    flop1Element.src = `images/poker cards/${game.flop1._num}_of_${game.flop1._suit.toLowerCase()}.png`;
+    flop2Element.src = `images/poker cards/${game.flop2._num}_of_${game.flop2._suit.toLowerCase()}.png`;
+    flop3Element.src = `images/poker cards/${game.flop3._num}_of_${game.flop3._suit.toLowerCase()}.png`;
+    turnElement.src = `images/poker cards/${game.turn._num}_of_${game.turn._suit.toLowerCase()}.png`;
+    riverElement.src = `images/poker cards/${game.river._num}_of_${game.river._suit.toLowerCase()}.png`;
 
 
     // Changing users name to "YOU"
