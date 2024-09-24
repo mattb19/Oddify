@@ -4,6 +4,7 @@ const session = require('express-session');
 const http = require('http');
 const socketIo = require('socket.io');
 const { exec } = require('child_process');
+const { name } = require('ejs');
 
 const app = express();
 const server = http.createServer(app);
@@ -31,7 +32,8 @@ async function initializeGame() {
             if (error) {
                 return reject(`Error: ${stderr}`);
             }
-            resolve(stdout.trim());
+            resolve(JSON.parse(stdout));
+            console.log("Initialized!")
         });
     });
 }
@@ -39,29 +41,24 @@ async function initializeGame() {
 // This function handles the python script which adds a player move to the game
 function handleBet(inputGame, inputBet) {
     return new Promise((resolve, reject) => {
-        const input = JSON.stringify(inputGame);
-        const process = exec(`python3 handleBet.py "${inputBet}"`, { shell: true });
-
-        console.log(inputBet);
-
-        // Send the input JSON object to the Python script
-        process.stdin.write(input);
-        process.stdin.end();
-
+        const process = exec(`python handleBet.py "${inputBet}"`, { shell: true });
+      
         let output = '';
         let errorOutput = '';
+
         process.stdout.on('data', (data) => {
             output += data;
         });
 
         process.stderr.on('data', (data) => {
             errorOutput += data; // Accumulate error data
-            console.log(errorOutput);
+            console.error(`Error Output: ${data}`); // Log immediately
         });
 
         process.on('close', (code) => {
             if (code !== 0) {
-                return reject(`Process exited with code: ${code}\nError Output: ${errorOutput}`);
+                console.error(`Process exited with code: ${code}\nError Output: ${errorOutput}`);
+                return reject(new Error(`Error in Python script: ${errorOutput}`));
             }
             try {
                 resolve(JSON.parse(output));
@@ -70,9 +67,9 @@ function handleBet(inputGame, inputBet) {
             }
         });
 
-        process.stderr.on('data', (data) => {
-            reject(`Error: ${data}`);
-        });
+        // Send the input JSON object to the Python script
+        process.stdin.write(JSON.stringify(inputGame));
+        process.stdin.end();
     });
 }
 
@@ -101,22 +98,60 @@ app.post('/login', (req, res) => {
 
 // Rendering poker table with ejs template
 app.get('/poker', (req, res) => {
-    res.render('table', { username: req.session.username || 'Guest' });
+    const gameId = req.query.gameId || '0'; // Set a default game ID if needed
+    res.render('table', { username: req.session.username || 'Guest', gameId  });
 });
 
+const players = {};
 // Handle socket connections
 io.on('connection', (socket) => {
-    console.log('A user connected');
 
-    socket.emit('updateInfo', game);
+    // Getting gameID they joined
+    socket.on('joinGame', (gameId, username) => {
+        // Making the user leave any previous rooms they were in
+        if (socket.gameId) {
+            socket.leave(socket.gameId);
+            console.log(`${username} left room: ${socket.gameId}`);
+        }
 
-    // Handle call button event
-    socket.on('call', async (data) => {
-        const action = data.buttonId
+        // Joining the new game room
+        socket.join(gameId);
+        socket.gameId = gameId;
+        console.log(`${username} joined room: ${gameId}`);
 
+        players[socket.id] = {      // to be replaced with sql later
+            socketId: socket.id,
+            gameId: gameId,
+            username: username
+        }
+        
+        // Here we add the playerId to the player in the game object (to be replace with sql later)
+        const nameList = global.game.players.map(player => player.user);
+        const userIndex = nameList.indexOf(username);
+        global.game.players[userIndex].playerId = socket.id;
+        
+        socket.emit('updateInfo', modifyGame(global.game, socket.id)); // This specifically targets the socket
+    });
+
+    // Handle action button event, used to be on('call')
+    socket.on('action', async (data, gameId) => {
+        const id = gameId.gameId;
+        const action = data.dataString;
+        console.log(`Data received: ${action}`);
+    
         try {
             const updatedGame = await bet(action);
-            io.emit('updateInfo', updatedGame); // Emit the updated game state
+            global.game = updatedGame;
+            
+            // Getting a list of all players in the game (to be replaced with SQL)
+            const playersInGame = Object.values(players).filter(player => player.gameId === '3');
+            
+            // Sending the players the game object with only their cards
+            for (const player of playersInGame) {
+                const userGame = modifyGame(updatedGame, player.socketId);
+                io.to(player.socketId).emit('updateInfo', userGame); // Emit to specific socketId
+            }
+
         } catch (error) {
             console.error('Error handling bet:', error);
             socket.emit('error', 'Could not process bet.'); // Optional: Send error to client
@@ -124,7 +159,8 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        console.log('A user disconnected');
+        console.log(`A user disconnected from room: ${socket.gameId}`);
+        delete players[socket.id]; // to be replaced with sql later
     });
 });
 
@@ -140,3 +176,60 @@ io.on('connection', (socket) => {
         console.error('Error initializing game:', error);
     }
 })();
+
+// Modifying the game to only include what is needed to the client
+function modifyTableCards(game) {
+    let updatedGame = JSON.parse(JSON.stringify(game));
+
+    let flop1 = updatedGame.flop1;
+    let flop2 = updatedGame.flop2;
+    let flop3 = updatedGame.flop3;
+    let turn = updatedGame.turn;
+    let river = updatedGame.river;
+
+    // Helper function to reset card properties
+    function resetCard(card) {
+        card._suit = 'None';
+        card._num = 'None';
+        card._value = null;
+    }
+
+    // Reset flop, turn, and river depending on the round
+    if (updatedGame.round == 0) {
+        // Reset all cards for round 0
+        resetCard(flop1);
+        resetCard(flop2);
+        resetCard(flop3);
+        resetCard(turn);
+        resetCard(river);
+    } else if (updatedGame.round == 1) {
+        // Reset flop cards for round 1 (flop)
+        resetCard(turn);
+        resetCard(river);
+    } else if (updatedGame.round == 2) {
+        // Reset turn card for round 2 (turn)
+        resetCard(river);
+    }
+    // Return the modified copy of the game
+    return updatedGame;
+}
+
+// Modify the game by specific player, only sending them their own cards
+function modifyGame(game, playerId) {
+    const updatedGame = modifyTableCards(game);
+
+    function resetCard(card) {
+        card._suit = 'None';
+        card._num = 'None';
+        card._value = null;
+    }
+
+    for (const i of updatedGame.players) {
+        if (i.playerId !== playerId) {
+            resetCard(i.card1);
+            resetCard(i.card2);
+        }
+    }
+    return updatedGame;
+}
+

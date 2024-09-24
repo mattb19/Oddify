@@ -1,11 +1,12 @@
 class Player:
-    def __init__(self, user: str, card1, card2, chipCount: int, blind: int, 
+    def __init__(self, user: str, card1, card2, chipCount: int, blind: int, playerId: str = "",
                  currentBet: int = 0, handWorth: int = 0, turn: bool = False, allIn: bool = False,
                  totalValue:int = 0, spectate: bool = False, muck: bool = False) -> None:
         """
         Initialize a Player object.
 
         Args:
+            playerId (str): The playerId of the player.
             user (str): The username of the player.
             card1: The first card of the player.
             card2: The second card of the player.
@@ -18,6 +19,7 @@ class Player:
             spectate (bool, optional): Whether the player is spectating. Defaults to False.
             muck (bool, optional): Whether the player has mucked their hand. Defaults to False.
         """
+        self.playerId = playerId
         self.user = user.strip()
         self.card1 = card1
         self.card2 = card2

@@ -8,10 +8,10 @@
 
 .hole {
     position: absolute;
-    top: 50%;
+    top: 45%;
     left: 50%;
-    width: 65vw;  /* 65% of the viewport width */
-    height: 65vh; /* 65% of the viewport height */
+    width: 70vw;  /* 65% of the viewport width */
+    height: 70vh; /* 65% of the viewport height */
     transform: translate(-50%, -50%);
     box-shadow: 0 0 0 99999px rgb(8, 26, 43);
     background-color: transparent;
@@ -21,10 +21,10 @@
 
 .table {
     position: absolute;
-    top: 50%;
+    top: 45%;
     left: 50%;
-    width: 62vw;  /* 65% of the viewport width */
-    height: 60vh; /* 65% of the viewport height */
+    width: 67.5vw;  /* 65% of the viewport width */
+    height: 66vh; /* 65% of the viewport height */
     transform: translate(-50%, -50%);
     /* background-color: rgb(18, 46, 22); */
     background-image: radial-gradient(circle, green 10%, rgb(18, 46, 22) 100%);
@@ -32,7 +32,7 @@
 }
 
 body, html {
-    height: 100%;
+    height: 100vh;
     overflow: hidden;
     display: flex;
     justify-content: center;
@@ -41,6 +41,11 @@ body, html {
     font-family: "Tahoma", sans-serif;
     font-size: 21px;
     font-weight: bold;
+}
+
+#scaling{
+    width: 100%;
+    height: auto;
 }
 
 .circle {
@@ -73,140 +78,107 @@ body, html {
 /************* PLAYERS *************/
 
 .playerContainer {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    color: white;
+    text-align: center;
 }
 
 .playerSlot {
     position: absolute;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-}
-
-.profilePicContainer{
-    background-image: linear-gradient(to top left, rgba(39, 44, 34, 1), rgba(4, 43, 1, 1));
-    width: 300px;
-    padding: 8px;
-    border-radius: 18px;
-}
-
-.profilePicActive{
-    position: absolute;
-    background-color: transparent;
-    background-image: linear-gradient(to top left, rgb(128, 255, 0), rgb(110, 219, 102));;
-    width: 300px;
-    align-items: center;
-    height: 122px;
-    border-radius: 18px;
-    border: 4px solid transparent;
-    box-shadow: 
-    0 0 15px rgba(1, 255, 1), /* Outer glow */
-    0 0 25px rgba(1, 255, 1),
-    0 0 35px rgba(0, 255, 1);
-    animation: expand 2s ease;
-    animation-iteration-count: infinite;
-    z-index: -1;
-}
-
-@keyframes expand {
-    0% {
-        opacity: 1;
-        box-shadow: 
-        0 0 0px rgba(1, 255, 1), /* Outer glow */
-        0 0 0px rgba(1, 255, 1),
-        0 0 0px rgba(0, 255, 1);
-        width: 300px;
-        height: 122px;
-    }
-    50%{
-        opacity: 1;
-        box-shadow: 
-        0 0 15px rgba(1, 255, 1), /* Outer glow */
-        0 0 25px rgba(1, 255, 1),
-        0 0 35px rgba(0, 255, 1);
-        width: 300px;
-        height: 122px;
-    }
-    80%{
-        opacity: 1;
-        width: 360px;
-        height: 172px;
-    }
-    100% {
-        width: 200px;
-        height: 72px;
-        opacity: 0;
-    }
+    height: auto;
+    width: 6vw;
+    border-radius: 12px;
+    background-color: rgba(0, 0, 0, 0.849);
+    display: flex; /* Use flex for centering */
+    flex-direction: column; /* Stack items vertically */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
 }
 
 .profilePicture{
-    width: 100px;
-    border-radius: 13%;
-    margin-top: 3px;
-    margin-left: 179px;
+    width: 90%; /* Set width to 100% to fill playerSlot */
+    height: auto; /* Keep aspect ratio */
+    object-fit: cover; /* Cover the area without distortion */
+    border-radius: 10px;
 }
 
-.profilePictureR{
-    width: 100px;
-    border-radius: 13%;
-    margin-top: 3px;
-    margin-left: 5px;
+.playerChipCount {
+    font-size: 0.8vw; /* Scale font size with viewport width */
+    margin-top: 1%;
+    margin-bottom: 2%;
 }
 
-.playerChipCountL{
+.playerName {
+    font-size: 0.7vw; /* Scale font size with viewport width */
+    margin-top: 1%;
+    margin-bottom: 2%;
+}
+
+.playerCardContainer{
     position: absolute;
-    right: 38%;
-    bottom: 23%;
-    font-size: 28px;
-    margin-right: 8px;
-    text-align: right;
+    width: 6vw;
+    height: auto;
+}
+.playerCard1 {
+    position: absolute;
+    width: 45%;
+    height: auto;
+    left: 0vw;
+    transform: rotate(-10deg);
+}
+.playerCard2 {
+    position: absolute;
+    width: 45%;
+    height: auto;
+    left: 2vw;
+    transform: rotate(10deg);
 }
 
-.playerNameL{
-    position: absolute;
-    right: 38%;
-    bottom: 53%;
-    font-size: 16px;
-    margin-right: 8px;
-    margin-top: 3px;
-    margin-bottom: 5px;
+@keyframes fold1 {
+    0% {
+        opacity: 1;
+        left: 0vw;
+        transform: rotate(-10deg);
+    }
+    100%{
+        opacity: 0;
+        left: -4vw;
+        transform: rotate(50deg);
+    }
+}
+@keyframes fold2 {
+    0% {
+        opacity: 1;
+        left: 2vw;
+        transform: rotate(10deg);
+    }
+    100%{
+        opacity: 0;
+        left: -4vw;
+        transform: rotate(100deg);
+    }
 }
 
-.playerChipCountR{
-    position: absolute;
-    left: 38%;
-    bottom: 23%;
-    font-size: 28px;
-    margin-left: 8px;
-    text-align: left;
+@keyframes out {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.3;
+    }
 }
 
-.playerNameR{
-    position: absolute;
-    left: 38%;
-    bottom: 53%;
-    font-size: 16px;
-    margin-left: 8px;
-    margin-top: 3px;
-    margin-bottom: 5px;
-}
 
 /* Positioning the player slots */
-#player1 { bottom: 20%; left: calc(18%); transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
-#player2 { top: 49%; left: calc(15%); transform: translate(-50%, -50%); } /* Moved from 20.5% to 14.5% */
-#player3 { bottom: 62%; left: calc(19%); transform: translate(-50%, -50%); } /* Moved from 16.3% to 10.3% */
-#player4 { top: 18.5%; left: calc(40%); transform: translate(-50%, -50%); } /* Moved from 22.5% to 16.5% */
-#player5 { top: 18.5%; left: calc(60%); transform: translate(-50%, -50%); } /* Moved from 38% to 32% */
-#player6 { bottom: 62%; left: calc(81%); transform: translate(-50%, -50%); } /* Moved from 38% to 44% */
-#player7 { top: 49%; left: calc(85%); transform: translate(-50%, -50%); } /* Moved from 22.5% to 28.5% */
-#player8 { bottom: 20%; left: calc(82%); transform: translate(-50%, -50%); } /* Moved from 16.3% to 22.3% */
+#player0 { top: 75.35vh; left: 62.5vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
+#player1 { top: 68vh; left: 20vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
+#player2 { top: 45vh; left: 15.5vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
+#player3 { top: 22vh; left: 20vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
+#player4 { top: 10vh; left: 40vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
+#player5 { top: 10vh; left: 60vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
+#player6 { top: 22vh; left: 80vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
+#player7 { top: 45vh; left: 84.5vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
+#player8 { top: 68vh; left: 80vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
+
 
 
 
@@ -218,27 +190,23 @@ body, html {
 /************* POT AND CURRENT BET INFORMATION *************/
 
 .tableInfoContainer {
-    position: fixed; /* Fixed positioning to keep it on top */
-    top: 54%;
-    left: 50%;
+    color: white; /* Text color */
+    text-align: center; /* Center the text */
+    position: absolute;
+    top: 50vh;
+    left: 50vw;
     transform: translate(-50%, -50%); /* Centering */
-    z-index: 1000; /* Ensure it is on top of other elements */
 }
 
 .pot {
-    color: white; /* Text color */
-    padding: 5px 5px; /* Padding for some spacing */
-    border-radius: 5px; /* Rounded corners */
-    font-size: 35px; /* Adjust font size as needed */
-    text-align: center; /* Center the text */
+    font-size: 1.7vw; /* Adjust font size as needed */
 }
+
 .currentBet {
     background-color: rgba(0, 0, 0, 0.3); /* Optional background for visibility */
-    color: white; /* Text color */
-    padding: 5px 5px; /* Padding for some spacing */
-    border-radius: 5px; /* Rounded corners */
-    font-size: 14px; /* Adjust font size as needed */
-    text-align: center; /* Center the text */
+    padding: 0.2vw; /* Padding for some spacing */
+    border-radius: 0.4vw; /* Rounded corners */
+    font-size: 0.7vw; /* Adjust font size as needed */
 }
 
 
@@ -249,23 +217,49 @@ body, html {
 /************* TABLE CARDS *************/
 
 .tableCardsContainer {
-    position: fixed; /* Fixed positioning to keep it on top */
-    top: 50%;
-    left: 50%;
+    position: absolute; /* Fixed positioning to keep it on top */
+    top: 53vh;
+    left: 50vw;
+    height: auto;
+    width: 10vw;
     transform: translate(-50%, -50%); /* Centering */
     z-index: 1001; /* Ensure it is on top of other elements */
 }
 .tableCard {
-    position: relative;
-    width: 7%;
-    animation: fadeTurn 1s forwards;
+    position: absolute;
+    width: 45%;
+    height: auto;
 }
-
-#flop1 { bottom: 15%; left: 34.4%; transform: translate(-50%, -50%); }
-#flop2 { bottom: 15%; left: 34.7%; transform: translate(-50%, -50%); }
-#flop3 { bottom: 15%; left: 35%; transform: translate(-50%, -50%);   }
-#turn  { bottom: 15%; left: 35.3%; transform: translate(-50%, -50%); }
-#river { bottom: 15%; left: 35.6%; transform: translate(-50%, -50%); }
+#flop1 {
+    position: absolute;
+    left: -5vw;
+    top: -15vh;
+    transform: translate(-50%, -50%);
+}
+#flop2 {
+    position: absolute;
+    left: 0vw;
+    top: -15vh;
+    transform: translate(-50%, -50%);
+}
+#flop3 {
+    position: absolute;
+    left: 5vw;
+    top: -15vh;
+    transform: translate(-50%, -50%);
+}
+#turn {
+    position: absolute;
+    left: 10vw;
+    top: -15vh;
+    transform: translate(-50%, -50%);
+}
+#river {
+    position: absolute;
+    left: 15vw;
+    top: -15vh;
+    transform: translate(-50%, -50%);
+}
 
 
 
@@ -274,57 +268,60 @@ body, html {
 /************* INTERACTION BUTTONS *************/
 
 .buttonContainer {
-    position: fixed; /* Keep it fixed to the viewport */
-    bottom: 15%; /* Distance from the bottom */
-    left: 50%; /* Center horizontally */
+    position: absolute;
+    bottom: 17vh; /* Distance from the bottom */
+    left: 50vw; /* Center horizontally */
     transform: translateX(-50%); /* Adjust to center */
     display: flex; /* Align buttons in a row */
-    gap: 20px; /* Space between buttons */
-    z-index: 1000; /* Ensure it's above other elements */
-    background-image: linear-gradient(to top left, rgba(51, 5, 5, 1), rgba(51, 83, 51, 1));
-    padding: 25px 38px; /* Add some padding */
+    gap: 1vw; /* Space between buttons */
+    background-color: rgba(0, 0, 0, 0.815);
+    padding: 1vw; /* Add some padding */
     border-radius: 15px; /* Optional: round corners */
+    z-index: 1000;
+    /* animation: expandButtons 2s infinite; */
 }
 
 .actionButton {
-    padding: 23px 38px;
-    font-size: 20px;
+    padding: 1vh 1vw;
+    font-size: 1.2vw;
     cursor: pointer;
-    color: white; /* Change the font color to white */
-    background-color: rgba(255, 255, 255, 0.2); /* Optional: background color */
+    color: rgb(0, 0, 0); /* Change the font color to white */
+    background-color: rgb(255, 255, 255); /* Optional: background color */
     border: none; /* Remove default button border */
-    border-radius: 10px; /* Optional: round corners */
+    border-radius: 0.5vw; /* Optional: round corners */
     font-family: "Tahoma", sans-serif;
     font-weight: bold;
-    touch-action: manipulation;
-}
-
-#betSliderContainer {
-    display: flex;
-    align-items: center;
-    gap: 10px; /* Space between slider and button */
-    display: none; /* Hidden by default */
-}
-
-.sliderContainer {
-    position: fixed; /* Keep it fixed to the viewport */
-    bottom: 20px; /* Distance from the bottom */
-    left: 50%; /* Center horizontally */
-    transform: translateX(-50%); /* Adjust to center */
-    display: none; /* Align buttons in a row */
-    gap: 20px; /* Space between buttons */
-    z-index: 1000; /* Ensure it's above other elements */
-    background-image: linear-gradient(to top left, rgba(51, 5, 5, .7), rgba(51, 83, 51, 1));
-    padding: 20px; /* Add some padding */
-    border-radius: 15px; /* Optional: round corners */
+    opacity: 1;
 }
 
 .actionButton span {
     transition: all 200ms;
 }
-
+  
 .actionButton:hover span {
-    opacity: .6;
+    transform: scale(.9);
+    opacity: .5;
+}
+
+@keyframes expandButtons {
+    0% {
+        box-shadow: 
+        0 0 0px rgba(1, 255, 1), /* Outer glow */
+        0 0 0px rgba(1, 255, 1),
+        0 0 0px rgba(0, 255, 1);
+    }
+    50% {
+        box-shadow: 
+        0 0 15px rgba(1, 255, 1), /* Outer glow */
+        0 0 25px rgba(1, 255, 1),
+        0 0 35px rgba(0, 255, 1);
+    }
+    100% {
+        box-shadow: 
+        0 0 0px rgba(1, 255, 1), /* Outer glow */
+        0 0 0px rgba(1, 255, 1),
+        0 0 0px rgba(0, 255, 1);
+    }
 }
 
 
@@ -335,4 +332,157 @@ body, html {
     font-size: 20px;
     top: 1%;
     color: white;
+}
+
+
+
+
+
+/************* SLIDER HANDLER *************/
+.custom-slider-container {
+    position: absolute;
+    right: 50vw;
+    bottom: 5vh;
+    display: flex;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.808);
+    padding: 0.8vw;
+    border-radius: 0.5vw;
+    transform: translateX(50%);
+    overflow: hidden; /* Hide overflow */
+    white-space: nowrap; /* Prevent text wrapping */
+    text-overflow: ellipsis; /* Show ellipsis for overflowed text */
+    opacity: 0;
+    gap: 1vh;
+}
+
+.custom-slider {
+    -webkit-appearance: none;
+    width: 21vw;
+    height: 2vh;
+    border-radius: 5px;
+    background-image: linear-gradient(to right, rgb(69, 150, 61), rgb(182, 38, 38));
+    outline: none;
+}
+
+.custom-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 0.4vw;
+    height: 2.2vh;
+    border-radius: 25%;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+.custom-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #4CAF50;
+    cursor: pointer;
+}
+
+.slider-value-button:hover {
+    background-color: #45a049;
+}
+
+@keyframes sliderfade {
+    0%{
+        opacity: 0;
+        bottom: 5vh;
+    }
+    100%{
+        opacity: 1;
+        bottom: 1.8vh;
+    }
+}
+
+
+
+
+
+
+/************* CUSTOM VALUE BUTTONS *************/
+
+.customBetContainer {
+    position: absolute;
+    right: 100vw;
+    bottom: -6vh;
+    display: flex;
+    background-color: rgba(0, 0, 0, 0.815);
+    border-radius: 15px; /* Optional: round corners */
+    z-index: 1000;
+    opacity: 0;
+}
+
+#customBets {
+    padding: 0; /* Remove padding for better centering */
+    font-size: 0.7vw; 
+    color: rgb(0, 0, 0); /* Change the font color to black */
+    background-color: rgb(255, 255, 255); /* Optional: background color */
+    border: none; /* Remove default button border */
+    border-radius: 0.5vh;
+    margin: 0; /* Remove negative margin */
+    width: 4.5vw;
+    height: 3.5vh; /* Adjust height for better spacing */
+    display: flex; /* Use flexbox for alignment */
+    justify-content: center; /* Center text horizontally */
+    align-items: center; /* Center text vertically */
+}
+
+#cVal0 {
+    transform: translate(-50%, -50%);
+    position: absolute;
+}
+#cVal1 {
+    transform: translate(-50%, -50%);
+    position: absolute;
+}
+#cVal2 {
+    transform: translate(-50%, -50%);
+    position: absolute;
+}
+#cVal3 {
+    transform: translate(-50%, -50%);
+    position: absolute;
+}
+
+@keyframes customFade {
+    0%{
+        opacity: 0;
+        bottom: -6vh;
+    }
+    100%{
+        opacity: 1;
+        bottom: -8vh;
+    }
+}
+
+
+
+
+/************* USERS HAND *************/
+.userCardContainer {
+    position: absolute;
+    bottom: 43vh;
+    height: auto;
+    width: 12vw;
+}
+
+.userCard1 {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    transform: rotate(10deg);
+    left: 5vw;
+    height: auto;
+    width: 50%;
+}
+.userCard2 {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    transform: rotate(-10deg);
+    right: 5vw;
+    height: auto;
+    width: 50%;
 }

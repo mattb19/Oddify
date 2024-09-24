@@ -1,19 +1,21 @@
 import random
 import time
 import json
-from library import Card, Player, CheckHands
+from library.Player import Player
+from library.CheckHands import CheckHands
+from library.Card import Card
 from copy import deepcopy
 from itertools import groupby
 
 class Game:
-    def __init__(self, gameID, players, smallBlind, bigBlind, deck=None, pot=0, currentBet=0, round=0, currentPlayer=None, tableCards=None, 
+    def __init__(self, gameID="0", players=[], smallBlind=10, bigBlind=20, deck=None, pot=0, currentBet=0, round=0, currentPlayer=None, 
                  lastWinners=None, playerQueue=None, active=False, blinds=None, flip=True, bombPot=False, 
                  flop1=None, flop2=None, flop3=None, turn=None, river=None, Time=0) -> None:
         """
         Initializes a new game instance with the provided parameters.
 
         Args:
-            gameID (int): Unique identifier for the game.
+            gameID (str): Unique base62 identifier for the game.
             players (list of Player): List of players participating in the game.
             smallBlind (int): Amount for the small blind.
             bigBlind (int): Amount for the big blind.
@@ -22,7 +24,6 @@ class Game:
             currentBet (int, optional): Current bet amount. Defaults to 0.
             round (int, optional): The current round number. Defaults to 0.
             currentPlayer (Player, optional): The player whose turn it is. Defaults to None.
-            tableCards (list of Card, optional): Cards on the table. Defaults to an empty list.
             lastWinners (list of Player, optional): List of last winners. Defaults to an empty list.
             playerQueue (list of Player, optional): Queue of players. Defaults to an empty list.
             active (bool, optional): Whether the game is active. Defaults to False.
@@ -43,7 +44,6 @@ class Game:
         self.currentBet = currentBet
         self.round = round
         self.currentPlayer = currentPlayer
-        self.tableCards = tableCards if tableCards is not None else []
         self.lastWinners = lastWinners if lastWinners is not None else []
         self.playerQueue = playerQueue if playerQueue is not None else []
         self.active = active
@@ -107,12 +107,12 @@ class Game:
         self.shuffleDeck()
         self.players = [player for player in self.players if not player.getSpectate()] + self.playerQueue
         self.playerQueue = []
+        self.players = [player for player in self.players if player.getChipCount() > 0]
 
         # Reset round and game status
         self.round = 0
         self.pot = 0
         self.lastWinners = []
-        self.tableCards = []
 
         # Set player hands worth to 0
         for player in self.players:
@@ -153,14 +153,17 @@ class Game:
 
         self.currentBet = self.bigBlind
 
-        # Set table cards to face down
-        self.flop1 = self.flop2 = self.flop3 = self.turn = self.river = Card("None", "None", 0)
-
         # Deal new cards to players
         self.dealCards()
 
         # Determine flop, turn, and river cards
-        self.tableCards = [self.deck.pop() for _ in range(5)]
+        self.flop1 = self.deck.pop()
+        self.flop2 = self.deck.pop()
+        self.flop3 = self.deck.pop()
+        self.turn = self.deck.pop()
+        self.river = self.deck.pop()
+        
+        self.deck = []
 
         # Set current player to the one after the big blind
         self.setCurrentPlayer()
@@ -227,12 +230,12 @@ class Game:
             player.setTurn(False)
             result = f"{player.user} Checks!"
         
-        elif value == self.currentBet and value < player.getChipCount():
+        elif value <= self.currentBet and value < player.getChipCount():
             # Player calls
             player.setTotalValue(player.getTotalValue()+(value - player.getCurrentBet()))
-            player.setChipCount(player.getChipCount()-(value - player.getCurrentBet()))
+            player.setChipCount(player.getChipCount()-(self.currentBet - player.getCurrentBet()))
             player.setTurn(False)
-            self.pot += value - player.getCurrentBet()
+            self.pot += self.currentBet - player.getCurrentBet()
             player.setCurrentBet(self.currentBet)
             result = f"{player.user} calls {value}! Pot is now {self.pot}!"
         
@@ -246,7 +249,7 @@ class Game:
             player.setCurrentBet(self.currentBet)
             result = f"{player.user} raises {value}! Pot is now {self.pot}!"
         
-        elif value - player.getCurrentBet() == player.getChipCount():
+        elif value - player.getCurrentBet() >= player.getChipCount():
             # Player goes all-in
             player.setTotalValue(player.getTotalValue()+(value - player.getCurrentBet()))
             player.setChipCount(0)
@@ -259,11 +262,7 @@ class Game:
             
         elif value + player.getCurrentBet() < self.currentBet:
             # Not enough to call or raise
-            raise ValueError("You must put more in to call or raise")
-        
-        elif value > player.getChipCount():
-            # Insufficient funds
-            raise ValueError("Insufficient Funds")
+            raise ValueError("Bet not high enough")
         
         # Set turns for remaining players
         for p in self.players:
@@ -301,34 +300,21 @@ class Game:
         if (len(allinPlayers) == len(nonFolded)) or (len(allinPlayers) + 1 == len(nonFolded) and True not in turns):
             while self.round < 4:
                 if self.round == 0: #If Pre Flop
-                    # Deal the flop (first three community cards)
-                    self.flop1 = self.tableCards[0]
-                    self.flop2 = self.tableCards[1]
-                    self.flop3 = self.tableCards[2]
                     self.round = 1  # Move to the next round
                     
                 if self.round == 1: # If Flop
-                    # Deal the turn (fourth community card)
-                    self.turn = self.tableCards[3]
                     self.round += 1
                     
                 if self.round == 2: # If Turn
-                    # Deal the river (fifth community card)
-                    self.river = self.tableCards[4]
                     self.round += 1
                     
                 if self.round == 3: # If River
                     # End the current round
                     self.round = 4
-                    return self.endRound()
+                    return self.endHand()
         
         # If all players have called, checked, or folded
         if True not in turns:
-            # If it's the first round and there was a bomb pot, reset it
-            if self.bombPot and self.round == 0:
-                self.bombPot = False
-                time.sleep(5)  # Delay for UI updates
-                
             # Find the index of the player who posted the blind
             l = [i.getBlind() for i in self.players]
             blindIndex = l.index(1)
@@ -345,16 +331,6 @@ class Game:
             # Update the current player and reset current bet
             self.currentPlayer = c
             self.currentBet = 0
-
-            # Deal community cards based on the round
-            if self.round == 0:
-                self.flop1 = self.tableCards[0]
-                self.flop2 = self.tableCards[1]
-                self.flop3 = self.tableCards[2]
-            elif self.round == 1:
-                self.turn = self.tableCards[3]
-            elif self.round == 2:
-                self.river = self.tableCards[4]
             
             # If it's the last rotation, end the round
             if self.round == 3:
@@ -366,14 +342,6 @@ class Game:
                 return self.endHand()
 
             self.round += 1  # Move to the next round
-            
-            # Output the stage of the game
-            if self.round == 1:
-                result = "============= FLOP ============="
-            elif self.round == 2:
-                result = "============= TURN ============="
-            elif self.round == 3:
-                result = "============= RIVER ============="
 
             # Reset current bets for players who are not all-in or spectating
             for i in self.players:
@@ -382,7 +350,7 @@ class Game:
                     i.setTurn(True)
                 elif i.getAllIn():
                     i.setCurrentBetZero()
-            return result
+            return "SUCCESS"
         
         # Determine who's turn is next
         counter = self.currentPlayer
@@ -408,8 +376,8 @@ class Game:
         
         # Evaluate each player's hand
         for player in self.players:
-            cards = [self.tableCards[0], self.tableCards[1], self.tableCards[2], 
-                    self.tableCards[3], self.tableCards[4], player.getCard1(), player.getCard2()]
+            cards = [self.flop1, self.flop2, self.flop3, self.turn,
+                     self.river, player.getCard1(), player.getCard2()]
             
             # Check hand strength and update player's hand worth
             hand_functions = [
@@ -435,7 +403,7 @@ class Game:
             player.setCurrentBetZero()
             player.setHandWorthZero()
             
-        return winnings
+        self.newRound()
 
     def split_pot(self, winners):
         """
@@ -581,9 +549,6 @@ class Game:
     
     def getPlayerCountInt(self):
         return len(self.players)
-    
-    def setTableCards(self):
-        self.tableCards = [i for i in self.tableCards]
 
     def setGameID(self, gameID):
         self.gameID = gameID
@@ -627,25 +592,112 @@ class Game:
         return "Activated!"
     
     def json(self):
-        """
-        Serializes the game state into JSON format.
-        Returns a dictionary representation of the game.
-        """
-        try:
-            # Create a deep copy of the game instance
-            game = deepcopy(self)
+        def serialize_card(card):
+            return {
+                '_suit': card._suit,
+                '_num': card._num,
+                '_value': card._value
+            }
 
-            # Set table cards
-            game.setTableCards()
-            
-            # Prepare players for serialization
-            game.setPlayers([player.__dict__ for player in game.getPlayers()])
-            
-            # Serialize the game to JSON format
-            return json.loads(json.dumps(game, default=lambda o: o.__dict__))
+        def serialize_player(player):
+            return {
+                'user': player.user,
+                'card1': serialize_card(player.card1),
+                'card2': serialize_card(player.card2),
+                'chipCount': player.chipCount,
+                'blind': player.blind,
+                'currentBet': player.currentBet,
+                'handWorth': player.handWorth,
+                'turn': player.turn,
+                'allIn': player.allIn,
+                'spectate': player.spectate,
+                'muck': player.muck,
+                'totalValue': player.totalValue,
+                'playerId': player.playerId
+            }
+
+        game_data = {
+            'gameID': self.gameID,
+            'players': [serialize_player(player) for player in self.players],
+            'deck': [serialize_card(card) for card in self.deck],
+            'pot': self.pot,
+            'currentBet': self.currentBet,
+            'round': self.round,
+            'currentPlayer': self.currentPlayer,
+            'lastWinners': [winner.user for winner in self.lastWinners],
+            'playerQueue': [player.user for player in self.playerQueue],
+            'active': self.active,
+            'blinds': self.blinds,
+            'flip': self.flip,
+            'bombPot': self.bombPot,
+            'flop1': serialize_card(self.flop1),
+            'flop2': serialize_card(self.flop2),
+            'flop3': serialize_card(self.flop3),
+            'turn': serialize_card(self.turn),
+            'river': serialize_card(self.river),
+            'smallBlind': self.smallBlind,
+            'bigBlind': self.bigBlind,
+            'Time': self.Time
+        }
         
-        except TypeError as e:
-            return None
+        return json.dumps(game_data, default=str)  # Convert to JSON string
+
+    def from_json(self, json_data):
+        # Parse the JSON string to a Python dictionary
+        data = json.loads(json_data)
+
+        # Create Player objects from the parsed data
+        self.players = []
+        for player_data in data['players']:
+            card1 = Card(
+                player_data['card1']['_suit'],
+                player_data['card1']['_num'],
+                player_data['card1']['_value']
+            )
+            card2 = Card(
+                player_data['card2']['_suit'],
+                player_data['card2']['_num'],
+                player_data['card2']['_value']
+            )
+
+            player = Player(
+                playerId=player_data['playerId'],
+                user=player_data['user'],
+                card1=card1,
+                card2=card2,
+                chipCount=player_data['chipCount'],
+                blind=player_data['blind'],
+                currentBet=player_data['currentBet'],
+                handWorth=player_data['handWorth'],
+                turn=player_data['turn'],
+                allIn=player_data['allIn'],
+                spectate=player_data['spectate'],
+                muck=player_data['muck'],
+                totalValue=player_data['totalValue']
+            )
+            self.players.append(player)
+
+        self.flop1 = Card(data['flop1']['_suit'], data['flop1']['_num'], data['flop1']['_value'])
+        self.flop2 = Card(data['flop2']['_suit'], data['flop2']['_num'], data['flop2']['_value'])
+        self.flop3 = Card(data['flop3']['_suit'], data['flop3']['_num'], data['flop3']['_value'])
+        self.turn = Card(data['turn']['_suit'], data['turn']['_num'], data['turn']['_value'])
+        self.river = Card(data['river']['_suit'], data['river']['_num'], data['river']['_value'])
+
+        # Set other attributes
+        self.gameID = data['gameID']
+        self.smallBlind = data['smallBlind']
+        self.bigBlind = data['bigBlind']
+        self.pot = data['pot']
+        self.currentBet = data['currentBet']
+        self.round = data['round']
+        self.currentPlayer = data['currentPlayer']  # Set as needed
+        self.lastWinners = []  # Adjust as necessary
+        self.playerQueue = []  # Adjust as necessary
+        self.active = data['active']
+        self.blinds = data['blinds']
+        self.flip = data['flip']
+        self.bombPot = data['bombPot']
+        self.Time = data['Time']
 
     def reset(self, big, small, *players):
         """
@@ -664,7 +716,6 @@ class Game:
         self.currentBet = 0
         self.round = 0
         self.currentPlayer = 0
-        self.tableCards = []
         self.lastWinners = []
         self.playerQueue = []
         self.active = True
