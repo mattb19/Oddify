@@ -89,10 +89,10 @@ socket.on('updateInfo', (game) => {
     // Setting active marker on betting buttons if its users turn
     betButtonElement = document.getElementById('player00');
     if (currentPlayer == newNameList.indexOf(username)) {
-        betButtonElement.style.backgroundColor = "rgba(21, 255, 0, 0.849)";
+        betButtonElement.style.backgroundColor = "rgba(0, 175, 0, 1)";
         betButtonElement.style.animation = "expandButtons 2s infinite";
     } else {
-        betButtonElement.style.backgroundColor = "rgba(0, 0, 0, 0.849)";
+        betButtonElement.style.backgroundColor = "rgba(0, 0, 0, 1)";
         betButtonElement.style.animation = "None";
     }
 
@@ -134,11 +134,13 @@ socket.on('updateInfo', (game) => {
                 
                 // Setting turn indicator for whoevers turn it is
                 if (i === currentPlayer) {
-                    playerSlot.style.backgroundColor = "rgba(21, 255, 0, 0.849)";
+                    playerSlot.style.backgroundColor = "rgba(0, 175, 0, 1)";
                     playerSlot.style.animation = "expandButtons 2s infinite";
+                    playerSlot.style.color = "white";
                 } else {
-                    playerSlot.style.backgroundColor = "rgba(0, 0, 0, 0.849)";
+                    playerSlot.style.backgroundColor = "rgba(0, 0, 0, 1)";
                     playerSlot.style.animation = "None";
+                    playerSlot.style.color = "white";
                 }
                 
                 // Removing folded players cards and fading them out

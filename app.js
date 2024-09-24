@@ -17,7 +17,7 @@ const db = mysql.createConnection({
     host: 'localhost', // Your database host
     user: 'root', // Your database username
     password: '34$Hg5!7aD', // Your database password
-    database: 'povpoker' // Your database name
+    database: 'pov_poker' // Your database name
 });
 
 db.connect((err) => {
@@ -116,10 +116,9 @@ app.post('/login', (req, res) => {
 // Rendering poker table with ejs template
 app.get('/poker', (req, res) => {
     const gameId = req.query.gameId || '0'; // Set a default game ID if needed
-    res.render('table', { username: req.session.username || 'Guest', gameId  });
+    res.render('table', { username: req.session.username || 'mcmattman', gameId  });
 });
 
-const players = {};
 // Handle socket connections
 io.on('connection', (socket) => {
 
@@ -135,12 +134,24 @@ io.on('connection', (socket) => {
         socket.join(gameId);
         socket.gameId = gameId;
         console.log(`${username} joined room: ${gameId}`);
-
-        players[socket.id] = {      // to be replaced with sql later
+        const playerData = {
             socketId: socket.id,
             gameId: gameId,
             username: username
-        }
+        };
+        db.query(`
+            INSERT INTO player (socketId, gameId, username) 
+            VALUES (?, ?, ?)
+            ON DUPLICATE KEY UPDATE 
+                socketId = VALUES(socketId), 
+                gameId = VALUES(gameId)
+        `, 
+        [playerData.socketId, playerData.gameId, playerData.username], 
+        (error, results) => {
+            if (error) {
+                console.error('Error inserting/updating player:', error);
+            }
+        });
         
         // Here we add the playerId to the player in the game object (to be replace with sql later)
         const nameList = global.game.players.map(player => player.user);
@@ -152,23 +163,32 @@ io.on('connection', (socket) => {
 
     // Handle action button event, used to be on('call')
     socket.on('action', async (data, gameId) => {
-        const id = gameId.gameId;
+        const id = gameId.gameID;
         const action = data.dataString;
+
         console.log(`Data received: ${action}`);
-    
         try {
             const updatedGame = await bet(action);
             global.game = updatedGame;
             
             // Getting a list of all players in the game (to be replaced with SQL)
-            const playersInGame = Object.values(players).filter(player => player.gameId === '3');
-            
-            // Sending the players the game object with only their cards
-            for (const player of playersInGame) {
-                const userGame = modifyGame(updatedGame, player.socketId);
-                io.to(player.socketId).emit('updateInfo', userGame); // Emit to specific socketId
-            }
+            db.query('SELECT * FROM PLAYER WHERE gameId = ?', [id], (error, results) => {
+                if (error) {
+                    console.error('Error fetching players:', error);
+                    return;
+                }
+                results.forEach(player => {
+                    const userGame = modifyGame(updatedGame, player.socketId);
+                    io.to(player.socketId).emit('updateInfo', userGame);
+                });
+            });
 
+            // Planning on handling round timer here. (NEED TO MAKE NEW GAME TABLE, ADD LAST MODIFIED ATTRIBUTE)
+            // If the round == 4, we will call a newRound() function after 10 seconds (newRound needs to be made)
+            // Action action is declared above, we need to check and make sure bets cant get through while 10
+            // second timeout is active. We can use if round == 4 and current_time - game.lastModified < 10 seconds
+            // simply return if those conditions are met so we cant double stack the function
+            // SIMILAR LOGIC CAN BE APPLIED TO BOMB POT
         } catch (error) {
             console.error('Error handling bet:', error);
             socket.emit('error', 'Could not process bet.'); // Optional: Send error to client
@@ -177,7 +197,7 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         console.log(`A user disconnected from room: ${socket.gameId}`);
-        delete players[socket.id]; // to be replaced with sql later
+        // delete players[socket.id]; // to be replaced with sql later
     });
 });
 
