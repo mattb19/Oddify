@@ -1,9 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <style ></style>
+    <link rel="stylesheet" href="../public/login.css">
 </head>
 <body>
+    <div class="loginContainer">
+        <div class="bodyhead" id="bodyhead">
+            <div class="welcome" i="welcome">
+                <span>
+                    Welcome to POV Poker
+                </span>
+            </div>
+        </div>
+        <div class="bodysection" id="bodysectiom">
+            <form class="loginForm" id="loginForm">
+                <label class="left" for="username">Username</label><br>
+                    <input type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Enter Username Here"
+                    autofocus required><br>
+                <label class="left" for="password">Password</label><br>
+                    <input type="text"
+                    id="password"
+                    name="username"
+                    placeholder="Enter Password Here"
+                    required>
+                <button class="actionButton"><span>Sign In</span></button><br>
+                <div class="login-options">
+                    <label for="remember">Remember Me</label>
+                        <input type="checkbox"
+                        id="remember"
+                        name="remember">
+                    <a href=# id="forgot">Forgot Password?</a>
+                </div>
+            </form>
+            <form class="registerForm" id="registerForm">
+                <label class="left" for="username">Username</label><br>
+                    <input type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Enter Username Here"
+                    autofocus required><br>
+                <label class="left" for="email">Email</label><br>
+                    <input type="text"
+                    id="email"
+                    name="email"
+                    placeholder="Enter Email Here"
+                    autofocus required><br>
+                <label class="left" for="password">Password</label><br>
+                    <input type="text"
+                    id="password"
+                    name="password"
+                    placeholder="Enter Password Here"
+                    autofocus required><br>
+                <label class="left" for="confirmPassword">Confirm Password</label><br>
+                    <input type="text"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    placeholder="Confirm Password Here"
+                    required>
+                <button class="actionButton"><span>Sign In</span></button><br>
+                <div class="login-options">
+                    <label for="remember">Remember Me</label>
+                        <input type="checkbox"
+                        id="remember"
+                        name="remember">
+                    <a href=# id="forgot">Forgot Password?</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <a onclick="register()" href=# id="signUp">Dont have an account? <b>sign up now</b></a>
+    <a onclick="login()" href=# id="signIn">Already have an account?<b>sign in now</b></a>
+    <script src="../public/login.js"></script>
 </body>
 </html>
 <!DOCTYPE html>
