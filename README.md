@@ -12,6 +12,7 @@ Node ejs v3.1.10
 Node socket.io v4.8.0
 Node socket.io-client v4.8.0
 Node socket.io-express-session v0.1.3
+MySQL v0.9.1
 ```
 
 ## How to Run

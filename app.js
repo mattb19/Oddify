@@ -124,7 +124,6 @@ io.on('connection', (socket) => {
             gameId: gameId,
             username: username
         }
-        console.log(socket.id)
         
         // Here we add the playerId to the player in the game object (to be replace with sql later)
         const nameList = global.game.players.map(player => player.user);
