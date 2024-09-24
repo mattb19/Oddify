@@ -11,6 +11,23 @@ const server = http.createServer(app);
 const io = socketIo(server);
 const PORT = process.env.PORT || 3000;
 
+const mysql = require('mysql2');
+
+const db = mysql.createConnection({
+    host: 'localhost', // Your database host
+    user: 'root', // Your database username
+    password: '34$Hg5!7aD', // Your database password
+    database: 'povpoker' // Your database name
+});
+
+db.connect((err) => {
+    if (err) {
+        console.error('Database connection failed:', err.stack);
+        return;
+    }
+    console.log('Connected to database.');
+});
+
 // Middleware for parsing URL-encoded data
 app.use(express.urlencoded({ extended: true }));
 

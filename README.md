@@ -13,6 +13,7 @@ Node socket.io v4.8.0
 Node socket.io-client v4.8.0
 Node socket.io-express-session v0.1.3
 MySQL v0.9.1
+Node mysql2 v3.11.3
 ```
 
 ## How to Run
