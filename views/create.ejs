@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Form</title>
+</head>
+<body>
+    <h1>NEW GAME</h1>
+    <form id="dataForm" action="/create" method="POST">        
+        <label for="buyin">Buy-in:</label>
+        <select id="buyin" name="buyin" required>
+            <option value="100">100</option>
+            <option value="500">500</option>
+            <option value="1000" selected>1000</option>
+            <option value="5000">5000</option>
+            <option value="10000">10000</option>
+            <option value="50000">50000</option>
+            <option value="100000">100000</option>
+        </select>
+    
+        <label for="blind">Blind:</label>
+        <select id="blind" name="blind" required>
+            <option value="2%" selected>2% of Buy-in</option>
+            <option value="4%">4% of Buy-in</option>
+            <option value="10%">10% of Buy-in</option>
+        </select>
+    
+        <label for="gametype">Game Type:</label>
+        <select id="gametype" name="gametype" required>
+            <option value="normal">Normal</option>
+            <option value="normal_with_abilities" selected>Normal with Abilities</option>
+            <option value="tournament">Tournament</option>
+        </select>
+
+        <input type="hidden" id="sessionName" name="sessionName" value="CURRENT_SESSION_NAME">
+        
+        <button type="submit">Submit</button>
+    </form>
+    
+    <script>
+        window.uname = '<%= username %>'; // Use EJS syntax to access the session variable
+        document.getElementById('sessionName').value = window.uname;
+
+                // Function to update blind selection based on buy-in
+        function updateBlindSelection() {
+            const buyinValue = parseInt(document.getElementById('buyin').value);
+            const blindSelect = document.getElementById('blind');
+            const options = blindSelect.querySelectorAll('option');
+
+            options.forEach(option => {
+                const percentage = parseInt(option.value) / 100;
+                option.textContent = `${percentage * 100}% of Buy-in (${(buyinValue * percentage).toFixed(2)})`;
+            });
+        }
+
+        // Set default values and update blind selection on load
+        updateBlindSelection();
+        document.getElementById('buyin').addEventListener('change', updateBlindSelection);
+
+        document.getElementById('dataForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+            
+            const formData = new FormData(this);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+            console.log(data)
+
+            fetch('/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => {
+                // Check if the response is a redirect
+                if (response.redirected) {
+                    // If redirected, you can either use window.location to navigate
+                    window.location.href = response.url; // Redirects to the new URL
+                } else {
+                    // If not redirected, try to parse the response as JSON
+                    return response.json().then(data => {
+                        console.log('Success:', data);
+                        alert('Form submitted successfully!');
+                    });
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('Error submitting form!');
+            });
+        });
+    </script>
+</body>
+</html>

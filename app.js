@@ -5,6 +5,7 @@ const http = require('http');
 const socketIo = require('socket.io');
 const { exec } = require('child_process');
 const { name } = require('ejs');
+const bodyParser = require('body-parser'); // Ensure you have this to parse JSON
 
 const app = express();
 const server = http.createServer(app);
@@ -25,11 +26,12 @@ db.connect((err) => {
         console.error('Database connection failed:', err.stack);
         return;
     }
-    console.log('Connected to database.');
 });
 
 // Middleware for parsing URL-encoded data
 app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json()); // Parse JSON bodies
+app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
 // Session setup
 app.use(session({
@@ -43,14 +45,19 @@ app.use(express.static(path.join(__dirname, '/public')));
 app.set('view engine', 'ejs');
 
 // This function initializes a game object
-async function initializeGame() {
+async function initializeGame(id, buyin, blind, playerNames) {
     return new Promise((resolve, reject) => {
-        exec('python3 initializeGame.py', (error, stdout, stderr) => {
+        // Join playerNames into a single string (if it's an array)
+        const playerNamesStr = Array.isArray(playerNames) ? playerNames.join(',') : playerNames;
+
+        // Create the command string with all arguments
+        const command = `python3 initializeGame.py ${id} ${buyin} ${blind} "${playerNamesStr}"`;
+
+        exec(command, (error, stdout, stderr) => {
             if (error) {
                 return reject(`Error: ${stderr}`);
             }
             resolve(JSON.parse(stdout));
-            console.log("Initialized!")
         });
     });
 }
@@ -91,9 +98,9 @@ function handleBet(inputGame, inputBet) {
 }
 
 // This function gets the output from the handleBet script
-async function bet(betAmount) {
+async function bet(betAmount, gameObject) {
     try {
-        const updatedJson = await handleBet(game, betAmount);
+        const updatedJson = await handleBet(gameObject, betAmount);
         return updatedJson;
     } catch (error) {
         console.error(error);
@@ -114,9 +121,49 @@ app.post('/login', (req, res) => {
 });
 
 // Rendering poker table with ejs template
-app.get('/poker', (req, res) => {
-    const gameId = req.query.gameId || '0'; // Set a default game ID if needed
-    res.render('table', { username: req.session.username || 'mcmattman', gameId  });
+app.get('/poker', async (req, res) => {
+    const gameId = req.query.gameId || '0';
+
+    try {
+        res.render('table', { username: req.session.username || 'mcmattman', gameId });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error initializing game');
+    }
+});
+
+app.get('/create', async (req, res) => {
+    try {
+        res.render('create', { username: req.session.username || 'mcmattman' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error initializing game');
+    }
+});
+
+app.post('/create', async (req, res) => {
+    const { sessionName, buyin, blind, gametype } = req.body;
+
+    try {
+        const gameId = await newGameId();
+        const gameObject = await initializeGame(gameId, buyin, blind, [sessionName]);
+
+
+        const query = 'INSERT INTO GAME (gameId, gameObject) VALUES (?, ?)';
+        const values = [gameId, JSON.stringify(gameObject)];
+
+        db.query(query, values, (error, results) => {
+            if (error) {
+                console.error('Error executing query:', error);
+                return res.status(500).json({ message: 'Error executing query', error: error.message });
+            }
+            // Respond with a success message
+            res.redirect(`/poker?gameId=${gameId}`);
+        });
+    } catch (error) {
+        console.error('Error creating game:', error);
+        res.status(500).json({ message: 'Error creating game', error: error.message });
+    }
 });
 
 // Handle socket connections
@@ -153,25 +200,71 @@ io.on('connection', (socket) => {
             }
         });
         
-        // Here we add the playerId to the player in the game object (to be replace with sql later)
-        const nameList = global.game.players.map(player => player.user);
-        const userIndex = nameList.indexOf(username);
-        global.game.players[userIndex].playerId = socket.id;
-        
-        socket.emit('updateInfo', modifyGame(global.game, socket.id)); // This specifically targets the socket
+        db.query('SELECT gameObject FROM GAME WHERE gameId = ?', [gameId], (error, results) => {
+            if (error) {
+                console.error('Error retrieving gameObject:', error);
+                return;
+            }
+            if (results.length > 0) {
+                const gameObject = JSON.parse(results[0].gameObject); // Assign the retrieved value to the constant
+                const nameList = gameObject.players.map(player => player.user);
+                const userIndex = nameList.indexOf(username);
+                if (userIndex !== -1) {
+                    gameObject.players[userIndex].playerId = socket.id;
+                    socket.emit('updateInfo', modifyGame(gameObject, socket.id));
+                } else {
+                    socket.emit('updateInfo', modifyGame(gameObject, socket.id)); 
+                }
+                db.query('UPDATE GAME SET gameObject = ? WHERE gameId = ?', 
+                    [JSON.stringify(gameObject), gameId], (error, results) => {
+                    if (error) {
+                        console.error('Error updating game object:', error);
+                        return;
+                    }
+                });
+            } else {
+                console.log(`No game found with the given gameId (${gameId}). Redirecting to create table`);
+                io.to(socket.id).emit('redirect', { url: '/create' });
+            }
+        });
     });
 
-    // Handle action button event, used to be on('call')
     socket.on('action', async (data, gameId) => {
-        const id = gameId.gameID;
+        const id = gameId.gameId;
         const action = data.dataString;
 
         console.log(`Data received: ${action}`);
+        const gameObject = await new Promise((resolve, reject) => {
+            db.query('SELECT gameObject FROM GAME WHERE gameId = ?', [id], (error, results) => {
+                if (error) {
+                    console.error('Error fetching game object:', error);
+                    return reject(error);
+                }
+                resolve(results);
+            });
+        });
+        tgame = JSON.parse(gameObject[0].gameObject);
+        if (tgame.round == 4) {
+            console.log("Unable to place bet at end of hand")
+            return;
+        }
+
         try {
-            const updatedGame = await bet(action);
-            global.game = updatedGame;
+            // Getting game object from database
+            const gameObject = await new Promise((resolve, reject) => {
+                db.query('SELECT gameObject FROM GAME WHERE gameId = ?', [id], (error, results) => {
+                    if (error) {
+                        console.error('Error fetching game object:', error);
+                        return reject(error);
+                    }
+                    resolve(results);
+                });
+            });
+            game = JSON.parse(gameObject[0].gameObject);
+
+            const updatedGame = await bet(action, game);
             
-            // Getting a list of all players in the game (to be replaced with SQL)
+            // Sending all players the updated game info
             db.query('SELECT * FROM PLAYER WHERE gameId = ?', [id], (error, results) => {
                 if (error) {
                     console.error('Error fetching players:', error);
@@ -183,8 +276,38 @@ io.on('connection', (socket) => {
                 });
             });
 
-            // Planning on handling round timer here. (NEED TO MAKE NEW GAME TABLE, ADD LAST MODIFIED ATTRIBUTE)
-            // If the round == 4, we will call a newRound() function after 10 seconds (newRound needs to be made)
+            db.query('UPDATE GAME SET gameObject = ? WHERE gameId = ?', 
+                [JSON.stringify(updatedGame), id], (error, results) => {
+                if (error) {
+                    console.error('Error updating game object:', error);
+                    return;
+                }
+            });
+
+            // If its the end of hand, we give a 10 second delay then call newRound for UI purposes
+            if (updatedGame.round == 4) {
+                await wait(5000);
+                const newRound = await bet("NEW_ROUND", game);
+
+                // Sending all players the game with a new round
+                db.query('SELECT * FROM PLAYER WHERE gameId = ?', [id], (error, results) => {
+                    if (error) {
+                        console.error('Error fetching players:', error);
+                        return;
+                    }
+                    results.forEach(player => {
+                        const userGame = modifyGame(newRound, player.socketId);
+                        io.to(player.socketId).emit('updateInfo', userGame);
+                    });
+                    db.query('UPDATE GAME SET gameObject = ? WHERE gameId = ?', 
+                        [JSON.stringify(newRound), id], (error, results) => {
+                        if (error) {
+                            console.error('Error updating game object:', error);
+                            return;
+                        }
+                    });
+                });
+            }
             // Action action is declared above, we need to check and make sure bets cant get through while 10
             // second timeout is active. We can use if round == 4 and current_time - game.lastModified < 10 seconds
             // simply return if those conditions are met so we cant double stack the function
@@ -204,7 +327,6 @@ io.on('connection', (socket) => {
 // Initialize game and start the server
 (async () => {
     try {
-        global.game = await initializeGame(); // Initialize game globally
 
         server.listen(PORT, () => {
             console.log(`Server is running on http://localhost:${PORT}`);
@@ -254,6 +376,7 @@ function modifyTableCards(game) {
 // Modify the game by specific player, only sending them their own cards
 function modifyGame(game, playerId) {
     const updatedGame = modifyTableCards(game);
+    // return updatedGame; // To see all players hands for debug purposes
 
     function resetCard(card) {
         card._suit = 'None';
@@ -270,3 +393,28 @@ function modifyGame(game, playerId) {
     return updatedGame;
 }
 
+// Generates a new 4-digit base36 code that doesnt exist in database and returns it
+async function newGameId() {
+    const generateId = () => {
+        return Math.random().toString(36).substring(2, 6).toUpperCase();
+    };
+
+    let gameId;
+    let exists;
+
+    do {
+        gameId = generateId();
+
+        // Check if the gameId exists in the database
+        const [rows] = await db.promise().query('SELECT COUNT(*) AS count FROM GAME WHERE gameId = ?', [gameId]);
+        exists = parseInt(rows[0].count) > 0;
+
+    } while (exists);
+
+    return gameId;
+}
+
+// Timer function (mainly for UI purposes)
+function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}

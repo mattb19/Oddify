@@ -1,21 +1,20 @@
 import random
-import time
 import json
 from library.Player import Player
 from library.CheckHands import CheckHands
 from library.Card import Card
-from copy import deepcopy
 from itertools import groupby
 
 class Game:
     def __init__(self, gameID="0", players=[], smallBlind=10, bigBlind=20, deck=None, pot=0, currentBet=0, round=0, currentPlayer=None, 
                  lastWinners=None, playerQueue=None, active=False, blinds=None, flip=True, bombPot=False, 
-                 flop1=None, flop2=None, flop3=None, turn=None, river=None, Time=0) -> None:
+                 flop1=None, flop2=None, flop3=None, turn=None, river=None, host=None) -> None:
         """
         Initializes a new game instance with the provided parameters.
 
         Args:
             gameID (str): Unique base62 identifier for the game.
+            host (str): Host of the game
             players (list of Player): List of players participating in the game.
             smallBlind (int): Amount for the small blind.
             bigBlind (int): Amount for the big blind.
@@ -35,9 +34,9 @@ class Game:
             flop3 (Card, optional): The third flop card. Defaults to a Card with no suit, number, or value.
             turn (Card, optional): The turn card. Defaults to a Card with no suit, number, or value.
             river (Card, optional): The river card. Defaults to a Card with no suit, number, or value.
-            Time (int, optional): The time related to the game. Defaults to 0.
         """
         self.gameID = gameID
+        self.host = host
         self.players = players
         self.deck = deck if deck is not None else []
         self.pot = pot
@@ -60,8 +59,6 @@ class Game:
         
         self.smallBlind = smallBlind
         self.bigBlind = bigBlind
-        
-        self.Time = Time
 
     def shuffleDeck(self):
         """
@@ -402,8 +399,6 @@ class Game:
         for player in self.players:
             player.setCurrentBetZero()
             player.setHandWorthZero()
-            
-        self.newRound()
 
     def split_pot(self, winners):
         """
@@ -525,12 +520,6 @@ class Game:
     
     def getBlinds(self):
         return str(self.bigBlind)+"/"+str(self.smallBlind)
-    
-    def setTime(self, Time):
-        self.Time = Time
-        
-    def getTime(self):
-        return self.Time
         
     def setFlop2(self, card):
         self.flop2 = card
@@ -618,6 +607,7 @@ class Game:
 
         game_data = {
             'gameID': self.gameID,
+            'host': self.host,
             'players': [serialize_player(player) for player in self.players],
             'deck': [serialize_card(card) for card in self.deck],
             'pot': self.pot,
@@ -637,7 +627,6 @@ class Game:
             'river': serialize_card(self.river),
             'smallBlind': self.smallBlind,
             'bigBlind': self.bigBlind,
-            'Time': self.Time
         }
         
         return json.dumps(game_data, default=str)  # Convert to JSON string
@@ -685,6 +674,7 @@ class Game:
 
         # Set other attributes
         self.gameID = data['gameID']
+        self.host = data['host']
         self.smallBlind = data['smallBlind']
         self.bigBlind = data['bigBlind']
         self.pot = data['pot']
@@ -697,7 +687,6 @@ class Game:
         self.blinds = data['blinds']
         self.flip = data['flip']
         self.bombPot = data['bombPot']
-        self.Time = data['Time']
 
     def reset(self, big, small, *players):
         """

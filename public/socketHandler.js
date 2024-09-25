@@ -1,3 +1,11 @@
+window.onload = function() {
+    const fragment = window.location.hash.substring(1); // Get the part after #
+    if (fragment) {
+        // Redirect to the same path with gameId as a query parameter
+        window.location.href = `/poker?gameId=${fragment}`;
+    }
+}
+
 function showBetSlider() {
     const slider = document.querySelector('.custom-slider-container');
     const cbets = document.querySelector('.customBetContainer');
@@ -13,13 +21,26 @@ function moveBetVal() {
 
 ///////////////////// Handle web socket Dynamic Updating /////////////////////
 const socket = io();
-const gameID = window.location.hash.substring(1);
+const urlParams = new URLSearchParams(window.location.search);
+const gameId = urlParams.get('gameId');
 const username = window.uname;
 
-socket.emit('joinGame', gameID, username);
+socket.emit('joinGame', gameId, username);
+
+socket.on('redirect', (data) => {
+    // Check if data.path is defined
+    if (data && data.url) {
+        const baseUrl = window.location.origin; // Get the base URL
+        window.location.href = baseUrl + data.url; // Redirect to the new page
+    } else {
+        console.error('Redirect path is undefined:', data);
+    }
+});
 
 // Listen for updates to pot and current bet
 socket.on('updateInfo', (game) => {
+    const username = window.uname;
+
     if (typeof game === 'string') {
         // Replace single quotes with double quotes
         game = game.replace(/'/g, '"');
@@ -32,8 +53,8 @@ socket.on('updateInfo', (game) => {
             game = JSON.parse(game); // Attempt to parse
         } catch (error) {
             console.error('Error parsing game JSON:', error);
-            console.error('Invalid JSON string:', game); // Log the invalid string
-            return; // Exit if parsing fails
+            console.error('Invalid JSON string:', game); 
+            return; 
         }
     }
 
@@ -41,17 +62,15 @@ socket.on('updateInfo', (game) => {
 
     const potElement = document.getElementById('potAmount');
     const currentBetElement = document.getElementById('currentBetAmount');
-    const blindButton = document.getElementById('cVal0');
-    const dblindButton = document.getElementById('cVal1');
-    const potButton = document.getElementById('cVal2');
-    const allInButton = document.getElementById('cVal3');
 
     potElement.innerText = game.pot;
     currentBetElement.innerText = `Current Bet: ${game.currentBet}`;
 
     userButtons = document.getElementById('mainButtonContainer');
-
-    const currentPlayerName = game.players[game.currentPlayer].user;
+    let currentPlayerName;
+    if (game.currentPlayer !== null) {
+        currentPlayerName = game.players[game.currentPlayer].user;
+    }
 
     // Hide all player slots and profilePicActive divs
     const totalPlayers = game.players.length;
@@ -187,5 +206,5 @@ function action(data) {
     const dataString = data;
     console.log(`Sending bet: ${dataString}`);
     // Emit the "action" (used to be "call") event to the server when the button is clicked
-    socket.emit('action', { dataString }, { gameID });
+    socket.emit('action', { dataString }, { gameId });
 }

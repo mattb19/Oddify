@@ -18,7 +18,7 @@ class CheckHands:
         suits.sort(reverse=True)
         
         # Check for Royal Flush
-        is_flush = all(suit == suits[0] for suit in suits)
+        is_flush = True if 5 in [suits.count(i) for i in suits] else False
         is_straight = (card_values[-1] == 14 and 
                        card_values == list(range(card_values[0], card_values[0] + 5)))
         

@@ -265,6 +265,8 @@ body, html {
 
 
 
+
+
 /************* INTERACTION BUTTONS *************/
 
 .buttonContainer {
@@ -326,6 +328,11 @@ body, html {
 
 
 
+
+
+
+
+
 /************* USER SESSION INFO *************/
 .username{
     position: absolute;
@@ -333,6 +340,9 @@ body, html {
     top: 1%;
     color: white;
 }
+
+
+
 
 
 
