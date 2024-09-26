@@ -11,6 +11,10 @@ Node socket.io-client v4.8.0
 Node socket.io-express-session v0.1.3
 MySQL v0.9.1
 Node mysql2 v3.11.3
+React v18.3.1
+React router-dom v6.26.2
+React scripts v5.0.1
+React web-vitals v2.1.4
 ```
 
 ## How to Run
