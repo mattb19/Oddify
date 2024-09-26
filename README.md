@@ -1,4 +1,4 @@
-# POVPoker
+# Oddify
 
 ## Dependencies
 ```console
