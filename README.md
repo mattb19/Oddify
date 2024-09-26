@@ -1,7 +1,4 @@
-# POV-Poker
-POV Poker is a work in progress. The end goal of this project is for users to be able to play poker with friends online, and for special abilities to be added.
-
-As of right now, POV Poker is still in early development. Some features do not work as expected while others have not been implemented yet. 
+# POVPoker
 
 ## Dependencies
 ```console
@@ -17,6 +14,14 @@ Node mysql2 v3.11.3
 ```
 
 ## How to Run
+Open 2 terminals. First terminal:
 ```console
+cd backend
 node app.js
 ```
+Second terminal:
+```console
+cd frontend
+npm start
+```
+Visit link on second terminal
