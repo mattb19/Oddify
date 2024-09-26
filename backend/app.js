@@ -5,20 +5,28 @@ const http = require('http');
 const socketIo = require('socket.io');
 const { exec } = require('child_process');
 const { name } = require('ejs');
-const bodyParser = require('body-parser'); // Ensure you have this to parse JSON
+const bodyParser = require('body-parser');
+const cors = require('cors');
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = socketIo(server, {
+    cors: {
+        origin: 'http://localhost:3000',
+        methods: ['GET', 'POST'],
+        allowedHeaders: ['Content-Type'],
+        credentials: true
+    }
+});
 const PORT = process.env.PORT || 3000;
 
 const mysql = require('mysql2');
 
 const db = mysql.createConnection({
-    host: 'localhost', // Your database host
-    user: 'root', // Your database username
-    password: '34$Hg5!7aD', // Your database password
-    database: 'pov_poker' // Your database name
+    host: 'localhost', 
+    user: 'root', 
+    password: '34$Hg5!7aD',
+    database: 'pov_poker' 
 });
 
 db.connect((err) => {
@@ -28,6 +36,14 @@ db.connect((err) => {
     }
 });
 
+// Middleware for CORS
+app.use(cors({
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type'],
+    credentials: true 
+}));
+
 // Middleware for parsing URL-encoded data
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json()); // Parse JSON bodies
@@ -35,9 +51,13 @@ app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
 // Session setup
 app.use(session({
-    secret: 'your-secret-key', // Change this to a strong secret
+    secret: 'your_secret_key',
     resave: false,
     saveUninitialized: true,
+    cookie: {
+        secure: false,
+        httpOnly: true, // Prevent JavaScript access to cookies
+    },
 }));
 
 // Serve static files from the "views" directory
@@ -107,17 +127,24 @@ async function bet(betAmount, gameObject) {
     }
 }
 
-// Serve the login page
-app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'login.html'));
-});
-
 // Handle login
 app.post('/login', (req, res) => {
-    const username = req.body.username;
-    req.session.username = username; // Store username in session
-    res.redirect('/poker'); // Redirect to home (poker table)
-    console.log(`${username} has logged in!`);
+    const { username } = req.body;
+    if (username) {
+        req.session.username = username; // Store username in session
+        console.log(`${username} has logged in!`);
+        return res.json({ success: true, username }); // Respond with success
+    } else {
+        return res.status(401).json({ success: false, message: "Invalid credentials" });
+    }
+});
+
+app.get('/api/auth/status', (req, res) => {
+    if (req.session.username) {
+        res.json({ loggedIn: true, username: req.session.username });
+    } else {
+        res.json({ loggedIn: false });
+    }
 });
 
 // Rendering poker table with ejs template
@@ -319,7 +346,9 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        console.log(`A user disconnected from room: ${socket.gameId}`);
+        if (socket.gameId){
+            console.log(`A user disconnected from room: ${socket.gameId}`);
+        }
         // delete players[socket.id]; // to be replaced with sql later
     });
 });
@@ -327,7 +356,7 @@ io.on('connection', (socket) => {
 // Initialize game and start the server
 (async () => {
     try {
-
+        const PORT = process.env.PORT || 4000;
         server.listen(PORT, () => {
             console.log(`Server is running on http://localhost:${PORT}`);
         });

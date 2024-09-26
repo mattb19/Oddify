@@ -1,0 +1,498 @@
+/************* TABLE AND MAIN BODY *************/
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.hole {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    width: 70vw;  /* 65% of the viewport width */
+    height: 70vh; /* 65% of the viewport height */
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 0 99999px rgb(20, 20, 20);
+    background-color: transparent;
+    border-radius: 500px; /* Aggressive corner rounding */
+}
+
+
+.table {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    width: 67.5vw;  /* 65% of the viewport width */
+    height: 66vh; /* 65% of the viewport height */
+    transform: translate(-50%, -50%);
+    /* background-color: rgb(18, 46, 22); */
+    background-image: radial-gradient(circle, rgb(90, 99, 14) 10%, rgb(158, 160, 46) 100%);
+    border-radius: 500px; /* Aggressive corner rounding */
+}
+
+body, html {
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+    font-family: "Tahoma", sans-serif;
+    font-size: 21px;
+    font-weight: bold;
+}
+
+#scaling{
+    width: 100%;
+    height: auto;
+}
+
+.circle {
+    width: 800vmin;
+    height: 800vmin;
+    z-index: 10000;
+    background: conic-gradient(
+        from 0deg,
+        rgb(81, 114, 81) 0deg, 
+        rgb(199, 199, 199) 180deg, 
+        rgb(81, 114, 81) 181deg,
+        rgb(199, 199, 199) 360deg
+    );
+    border-radius: 50%;
+    animation: spin 5s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+
+
+/************* PLAYERS *************/
+
+.playerContainer {
+    color: white;
+    text-align: center;
+}
+
+.playerSlot {
+    position: absolute;
+    height: auto;
+    width: 6vw;
+    border-radius: 12px;
+    background-color: rgb(0, 0, 0);
+    display: flex; /* Use flex for centering */
+    flex-direction: column; /* Stack items vertically */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+}
+
+.profilePicture{
+    width: 90%; /* Set width to 100% to fill playerSlot */
+    height: auto; /* Keep aspect ratio */
+    object-fit: cover; /* Cover the area without distortion */
+    border-radius: 10px;
+}
+
+.playerChipCount {
+    font-size: 0.8vw; /* Scale font size with viewport width */
+    margin-top: 1%;
+    margin-bottom: 2%;
+}
+
+.playerName {
+    font-size: 0.7vw; /* Scale font size with viewport width */
+    margin-top: 1%;
+    margin-bottom: 2%;
+}
+
+.playerCardContainer{
+    position: absolute;
+    width: 6vw;
+    height: auto;
+}
+.playerCard1 {
+    position: absolute;
+    width: 45%;
+    height: auto;
+    left: 0vw;
+    transform: rotate(-10deg);
+}
+.playerCard2 {
+    position: absolute;
+    width: 45%;
+    height: auto;
+    left: 2vw;
+    transform: rotate(10deg);
+}
+
+@keyframes fold1 {
+    0% {
+        opacity: 1;
+        left: 0vw;
+        transform: rotate(-10deg);
+    }
+    100%{
+        opacity: 0;
+        left: -4vw;
+        transform: rotate(50deg);
+    }
+}
+@keyframes fold2 {
+    0% {
+        opacity: 1;
+        left: 2vw;
+        transform: rotate(10deg);
+    }
+    100%{
+        opacity: 0;
+        left: -4vw;
+        transform: rotate(100deg);
+    }
+}
+
+@keyframes out {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.3;
+    }
+}
+
+
+/* Positioning the player slots */
+#player0 { top: 75.35vh; left: 62.5vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
+#player1 { top: 68vh; left: 20vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
+#player2 { top: 45vh; left: 15.5vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
+#player3 { top: 22vh; left: 20vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
+#player4 { top: 10vh; left: 40vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
+#player5 { top: 10vh; left: 60vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
+#player6 { top: 22vh; left: 80vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
+#player7 { top: 45vh; left: 84.5vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
+#player8 { top: 68vh; left: 80vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
+
+
+
+
+
+
+
+
+
+/************* POT AND CURRENT BET INFORMATION *************/
+
+.tableInfoContainer {
+    color: white; /* Text color */
+    text-align: center; /* Center the text */
+    position: absolute;
+    top: 50vh;
+    left: 50vw;
+    transform: translate(-50%, -50%); /* Centering */
+}
+
+.pot {
+    font-size: 1.7vw; /* Adjust font size as needed */
+}
+
+.currentBet {
+    background-color: rgba(0, 0, 0, 0.3); /* Optional background for visibility */
+    padding: 0.2vw; /* Padding for some spacing */
+    border-radius: 0.4vw; /* Rounded corners */
+    font-size: 0.7vw; /* Adjust font size as needed */
+}
+
+
+
+
+
+
+/************* TABLE CARDS *************/
+
+.tableCardsContainer {
+    position: absolute; /* Fixed positioning to keep it on top */
+    top: 53vh;
+    left: 50vw;
+    height: auto;
+    width: 10vw;
+    transform: translate(-50%, -50%); /* Centering */
+    z-index: 1001; /* Ensure it is on top of other elements */
+}
+.tableCard {
+    position: absolute;
+    width: 45%;
+    height: auto;
+}
+#flop1 {
+    position: absolute;
+    left: -5vw;
+    top: -15vh;
+    transform: translate(-50%, -50%);
+}
+#flop2 {
+    position: absolute;
+    left: 0vw;
+    top: -15vh;
+    transform: translate(-50%, -50%);
+}
+#flop3 {
+    position: absolute;
+    left: 5vw;
+    top: -15vh;
+    transform: translate(-50%, -50%);
+}
+#turn {
+    position: absolute;
+    left: 10vw;
+    top: -15vh;
+    transform: translate(-50%, -50%);
+}
+#river {
+    position: absolute;
+    left: 15vw;
+    top: -15vh;
+    transform: translate(-50%, -50%);
+}
+
+
+
+
+
+
+
+/************* INTERACTION BUTTONS *************/
+
+.buttonContainer {
+    position: absolute;
+    bottom: 17vh; /* Distance from the bottom */
+    left: 50vw; /* Center horizontally */
+    transform: translateX(-50%); /* Adjust to center */
+    display: flex; /* Align buttons in a row */
+    gap: 1vw; /* Space between buttons */
+    background-color: rgba(0, 0, 0, 0.815);
+    padding: 1vw; /* Add some padding */
+    border-radius: 15px; /* Optional: round corners */
+    z-index: 1000;
+    /* animation: expandButtons 2s infinite; */
+}
+
+.actionButton {
+    padding: 1vh 1vw;
+    font-size: 1.2vw;
+    cursor: pointer;
+    color: rgb(0, 0, 0); /* Change the font color to white */
+    background-color: rgb(255, 255, 255); /* Optional: background color */
+    border: none; /* Remove default button border */
+    border-radius: 0.5vw; /* Optional: round corners */
+    font-family: "Tahoma", sans-serif;
+    font-weight: bold;
+    opacity: 1;
+}
+
+.actionButton span {
+    transition: all 200ms;
+}
+  
+.actionButton:hover span {
+    transform: scale(.9);
+    opacity: .5;
+}
+
+@keyframes expandButtons {
+    0% {
+        box-shadow: 
+        0 0 0px rgba(0, 175, 1),
+        0 0 0px rgba(0, 175, 1),
+        0 0 0px rgba(0, 175, 1)
+    }
+    50% {
+        box-shadow: 
+        0 0 10px rgba(0, 175, 1),
+        0 0 20px rgba(0, 175, 1),
+        0 0 30px rgba(0, 175, 1)
+    }
+    100% {
+        box-shadow: 
+        0 0 0px rgba(0, 175, 1),
+        0 0 0px rgba(0, 175, 1),
+        0 0 0px rgba(0, 175, 1)
+    }
+}
+
+
+
+
+
+
+
+
+/************* USER SESSION INFO *************/
+.username{
+    position: absolute;
+    font-size: 20px;
+    top: 1%;
+    color: white;
+}
+
+
+
+
+
+
+
+
+/************* SLIDER HANDLER *************/
+.custom-slider-container {
+    position: absolute;
+    right: 50vw;
+    bottom: 5vh;
+    display: flex;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.808);
+    padding: 0.8vw;
+    border-radius: 0.5vw;
+    transform: translateX(50%);
+    overflow: hidden; /* Hide overflow */
+    white-space: nowrap; /* Prevent text wrapping */
+    text-overflow: ellipsis; /* Show ellipsis for overflowed text */
+    opacity: 0;
+    gap: 1vh;
+}
+
+.custom-slider {
+    -webkit-appearance: none;
+    width: 21vw;
+    height: 2vh;
+    border-radius: 5px;
+    background-image: linear-gradient(to right, rgb(69, 150, 61), rgb(182, 38, 38));
+    outline: none;
+}
+
+.custom-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 0.4vw;
+    height: 2.2vh;
+    border-radius: 25%;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+.custom-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #4CAF50;
+    cursor: pointer;
+}
+
+.slider-value-button:hover {
+    background-color: #45a049;
+}
+
+@keyframes sliderfade {
+    0%{
+        opacity: 0;
+        bottom: 5vh;
+    }
+    100%{
+        opacity: 1;
+        bottom: 1.8vh;
+    }
+}
+
+
+
+
+
+
+/************* CUSTOM VALUE BUTTONS *************/
+
+.customBetContainer {
+    position: absolute;
+    right: 100vw;
+    bottom: -6vh;
+    display: flex;
+    background-color: rgba(0, 0, 0, 0.815);
+    border-radius: 15px; /* Optional: round corners */
+    z-index: 1000;
+    opacity: 0;
+}
+
+#customBets {
+    padding: 0; /* Remove padding for better centering */
+    font-size: 0.7vw; 
+    color: rgb(0, 0, 0); /* Change the font color to black */
+    background-color: rgb(255, 255, 255); /* Optional: background color */
+    border: none; /* Remove default button border */
+    border-radius: 0.5vh;
+    margin: 0; /* Remove negative margin */
+    width: 4.5vw;
+    height: 3.5vh; /* Adjust height for better spacing */
+    display: flex; /* Use flexbox for alignment */
+    justify-content: center; /* Center text horizontally */
+    align-items: center; /* Center text vertically */
+}
+
+#cVal0 {
+    transform: translate(-50%, -50%);
+    position: absolute;
+}
+#cVal1 {
+    transform: translate(-50%, -50%);
+    position: absolute;
+}
+#cVal2 {
+    transform: translate(-50%, -50%);
+    position: absolute;
+}
+#cVal3 {
+    transform: translate(-50%, -50%);
+    position: absolute;
+}
+
+@keyframes customFade {
+    0%{
+        opacity: 0;
+        bottom: -6vh;
+    }
+    100%{
+        opacity: 1;
+        bottom: -8vh;
+    }
+}
+
+
+
+
+/************* USERS HAND *************/
+.userCardContainer {
+    position: absolute;
+    bottom: 43vh;
+    height: auto;
+    width: 12vw;
+}
+
+.userCard1 {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    transform: rotate(10deg);
+    left: 5vw;
+    height: auto;
+    width: 50%;
+}
+.userCard2 {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    transform: rotate(-10deg);
+    right: 5vw;
+    height: auto;
+    width: 50%;
+}
