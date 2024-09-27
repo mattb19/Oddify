@@ -10,30 +10,12 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState("");
 
-    // useEffect(() => {
-    //     let isMounted = true;
-
-    //     const checkAuthStatus = async () => {
-    //         try {
-    //             const response = await fetch('http://localhost:4000/api/auth/status', {
-    //                 credentials: 'include',
-    //             });
-    //             const data = await response.json();
-    //             if (isMounted && data.loggedIn) {
-    //                 console.log("User logged in!");
-    //             }
-    //         } catch (error) {
-    //             console.error('Failed to check auth status:', error);
-    //         }
-    //     };
-
-    //     checkAuthStatus();
-
-    //     return () => {
-    //         console.log(user);
-    //         isMounted = false; // Cleanup function
-    //     };
-    // }, []);
+    useEffect(() => {
+        const storedUser = localStorage.getItem('username');
+        if (storedUser) {
+            setUser(storedUser); // Restore user from localStorage
+        }
+    }, []);
 
     const login = async (username) => {
         try {
@@ -49,6 +31,7 @@ export const AuthProvider = ({ children }) => {
             if (response.ok) {
                 const data = await response.json();
                 setUser(data.username);
+                localStorage.setItem('username', data.username);
                 return data.username;
             } else {
                 const errorData = await response.json();
@@ -63,6 +46,7 @@ export const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         setUser(null);
+        localStorage.removeItem('username'); // Remove username from localStorage
         try {
             await fetch('http://localhost:4000/logout', {
                 method: 'POST',

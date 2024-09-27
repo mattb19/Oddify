@@ -27,7 +27,7 @@
     height: 66vh; /* 65% of the viewport height */
     transform: translate(-50%, -50%);
     /* background-color: rgb(18, 46, 22); */
-    background-image: radial-gradient(circle, rgb(90, 99, 14) 10%, rgb(158, 160, 46) 100%);
+    background-image: radial-gradient(circle, rgb(16, 175, 16) 10%, rgb(22, 65, 25) 100%);
     border-radius: 500px; /* Aggressive corner rounding */
 }
 
@@ -49,9 +49,12 @@ body, html {
 }
 
 .circle {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    left: 50vw;
+    top: 50vh;
     width: 800vmin;
     height: 800vmin;
-    z-index: 10000;
     background: conic-gradient(
         from 0deg,
         rgb(81, 114, 81) 0deg, 
@@ -71,6 +74,9 @@ body, html {
         transform: rotate(360deg);
     }
 }
+
+
+
 
 
 
@@ -167,9 +173,7 @@ body, html {
     }
 }
 
-
-/* Positioning the player slots */
-#player0 { top: 75.35vh; left: 62.5vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
+#player0 { top: 79vh; left: 50vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
 #player1 { top: 68vh; left: 20vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
 #player2 { top: 45vh; left: 15.5vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
 #player3 { top: 22vh; left: 20vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
@@ -267,33 +271,36 @@ body, html {
 
 
 
-/************* INTERACTION BUTTONS *************/
+/************* FOLD CALL CHECK BUTTONS *************/
 
 .buttonContainer {
     position: absolute;
-    bottom: 17vh; /* Distance from the bottom */
-    left: 50vw; /* Center horizontally */
-    transform: translateX(-50%); /* Adjust to center */
-    display: flex; /* Align buttons in a row */
-    gap: 1vw; /* Space between buttons */
-    background-color: rgba(0, 0, 0, 0.815);
-    padding: 1vw; /* Add some padding */
-    border-radius: 15px; /* Optional: round corners */
+    bottom: 13.4vh;
+    left: 40vw; 
+    transform: translateX(-50%); 
+    display: flex; 
+    gap: 1vw;
+    background-color: rgb(0, 0, 0);
+    padding: 1vw; 
+    border-radius: 0.5vw; 
     z-index: 1000;
-    /* animation: expandButtons 2s infinite; */
 }
 
 .actionButton {
-    padding: 1vh 1vw;
-    font-size: 1.2vw;
-    cursor: pointer;
-    color: rgb(0, 0, 0); /* Change the font color to white */
+    padding: 0; /* Remove padding for better centering */
+    font-size: 0.9vw; 
+    color: rgb(0, 0, 0); /* Change the font color to black */
     background-color: rgb(255, 255, 255); /* Optional: background color */
     border: none; /* Remove default button border */
-    border-radius: 0.5vw; /* Optional: round corners */
+    border-radius: 0.5vh;
+    margin: 0; /* Remove negative margin */
+    width: 5.1vw;
+    height: 3.8vh; /* Adjust height for better spacing */
+    display: flex; /* Use flexbox for alignment */
+    justify-content: center; /* Center text horizontally */
+    align-items: center; /* Center text vertically */
     font-family: "Tahoma", sans-serif;
     font-weight: bold;
-    opacity: 1;
 }
 
 .actionButton span {
@@ -308,23 +315,72 @@ body, html {
 @keyframes expandButtons {
     0% {
         box-shadow: 
-        0 0 0px rgba(0, 175, 1),
-        0 0 0px rgba(0, 175, 1),
-        0 0 0px rgba(0, 175, 1)
+        0 0 0vw rgba(255, 255, 255),
+        0 0 0vw rgba(255, 255, 255),
+        0 0 0vw rgba(255, 255, 255)
     }
     50% {
         box-shadow: 
-        0 0 10px rgba(0, 175, 1),
-        0 0 20px rgba(0, 175, 1),
-        0 0 30px rgba(0, 175, 1)
+        0 0 1vw rgba(255, 255, 255),
+        0 0 2vw rgba(255, 255, 255),
+        0 0 3vw rgba(255, 255, 255)
     }
     100% {
         box-shadow: 
-        0 0 0px rgba(0, 175, 1),
-        0 0 0px rgba(0, 175, 1),
-        0 0 0px rgba(0, 175, 1)
+        0 0 0vw rgba(255, 255, 255),
+        0 0 0vw rgba(255, 255, 255),
+        0 0 0vw rgba(255, 255, 255)
     }
 }
+
+
+
+
+
+
+
+/************* BET BUTTONS *************/
+.valueButtons {
+    position: absolute;
+    transform: translateX(50%); 
+    bottom: 13.4vh; 
+    right: 40vw; 
+    display: grid; 
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 0.5vw; 
+    column-gap: 1vw; 
+    background-color: rgb(0, 0, 0);
+    padding: 0.4vw; 
+    border-radius: 0.5vw; 
+    z-index: 1000;
+}
+
+.valueButton {
+    padding: 0; /* Remove padding for better centering */
+    font-size: 0.9vw; 
+    color: rgb(0, 0, 0); /* Change the font color to black */
+    background-color: rgb(255, 255, 255); /* Optional: background color */
+    border: none; /* Remove default button border */
+    border-radius: 0.5vh;
+    margin: 0; /* Remove negative margin */
+    width: 5.7vw;
+    height: 2.6vh; /* Adjust height for better spacing */
+    display: flex; /* Use flexbox for alignment */
+    justify-content: center; /* Center text horizontally */
+    align-items: center; /* Center text vertically */
+    font-family: "Tahoma", sans-serif;
+    font-weight: bold;
+}
+.valueButton span {
+    transition: all 200ms;
+}
+  
+.valueButton:hover span {
+    transform: scale(.9);
+    opacity: .5;
+}
+
+
 
 
 
@@ -352,7 +408,7 @@ body, html {
 .custom-slider-container {
     position: absolute;
     right: 50vw;
-    bottom: 5vh;
+    bottom: 5.8vh;
     display: flex;
     align-items: center;
     background-color: rgba(0, 0, 0, 0.808);
@@ -362,7 +418,7 @@ body, html {
     overflow: hidden; /* Hide overflow */
     white-space: nowrap; /* Prevent text wrapping */
     text-overflow: ellipsis; /* Show ellipsis for overflowed text */
-    opacity: 0;
+    opacity: 1;
     gap: 1vh;
 }
 
@@ -397,16 +453,6 @@ body, html {
     background-color: #45a049;
 }
 
-@keyframes sliderfade {
-    0%{
-        opacity: 0;
-        bottom: 5vh;
-    }
-    100%{
-        opacity: 1;
-        bottom: 1.8vh;
-    }
-}
 
 
 
@@ -423,12 +469,12 @@ body, html {
     background-color: rgba(0, 0, 0, 0.815);
     border-radius: 15px; /* Optional: round corners */
     z-index: 1000;
-    opacity: 0;
+    opacity: 1;
 }
 
 #customBets {
     padding: 0; /* Remove padding for better centering */
-    font-size: 0.7vw; 
+    font-size: 0.9vw; 
     color: rgb(0, 0, 0); /* Change the font color to black */
     background-color: rgb(255, 255, 255); /* Optional: background color */
     border: none; /* Remove default button border */
@@ -472,27 +518,51 @@ body, html {
 
 
 
+
+
+
+
 /************* USERS HAND *************/
 .userCardContainer {
     position: absolute;
+    transform: translate(-50%, -50%);
     bottom: 43vh;
+    left: 50vw;
     height: auto;
-    width: 12vw;
+    width: 11vw;
 }
 
-.userCard1 {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    transform: rotate(10deg);
-    left: 5vw;
-    height: auto;
-    width: 50%;
-}
 .userCard2 {
     position: absolute;
     transform: translate(-50%, -50%);
-    transform: rotate(-10deg);
-    right: 5vw;
+    transform: rotate(7deg);
+    left: 5.2vw;
     height: auto;
     width: 50%;
+    border: #000000;
+    
+}
+.userCard1 {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    transform: rotate(-7deg);
+    right: 5.2vw;
+    height: auto;
+    width: 50%;
+}
+
+
+
+
+
+
+
+
+/************* Current Bet Markers *************/
+.betsContainer {
+
+}
+
+.playerCurrentBet {
+
 }

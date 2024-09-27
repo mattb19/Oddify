@@ -139,6 +139,17 @@ app.post('/login', (req, res) => {
     }
 });
 
+app.post('/logout', (req, res) => {
+    const { username } = req.body;
+    if (username) {
+        req.session.username = username; // Store username in session
+        console.log(`${username} has logged out!`);
+        return res.json({ success: true, username }); // Respond with success
+    } else {
+        return res.status(401).json({ success: false, message: "Logout Failed" });
+    }
+});
+
 app.get('/api/auth/status', (req, res) => {
     if (req.session.username) {
         res.json({ loggedIn: true, username: req.session.username });
@@ -302,7 +313,8 @@ io.on('connection', (socket) => {
                     io.to(player.socketId).emit('updateInfo', userGame);
                 });
             });
-
+            
+            // Updating game in database
             db.query('UPDATE GAME SET gameObject = ? WHERE gameId = ?', 
                 [JSON.stringify(updatedGame), id], (error, results) => {
                 if (error) {
@@ -406,6 +418,9 @@ function modifyTableCards(game) {
 function modifyGame(game, playerId) {
     const updatedGame = modifyTableCards(game);
     // return updatedGame; // To see all players hands for debug purposes
+    if (game.round == 4) {
+        return updatedGame;
+    }
 
     function resetCard(card) {
         card._suit = 'None';

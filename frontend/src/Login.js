@@ -13,7 +13,7 @@ const Login = () => {
         setError(''); 
         try {
             await login(username); 
-            navigate('/home')
+            navigate('/home');
         } catch (error) {
             setError('Error during login. Please try again.');
             console.error('Error during login:', error);

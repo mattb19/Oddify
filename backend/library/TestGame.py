@@ -3,8 +3,7 @@ from library import Card, Player, CheckHands, Game
 class TestGame:
     def __init__(self, game, players) -> None:
         self.game = game
-        self.game.newRound()
-        
+              
     
     def test_all_in_split_pot(self, scenario_list, expected_results) -> bool:
         """

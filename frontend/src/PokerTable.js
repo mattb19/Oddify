@@ -10,6 +10,9 @@ const socket = io('http://localhost:4000');
 const PokerTable = () => {
     const [gameId, setGameId] = useState('');
     const [game, setGame] = useState({});
+    const [rotatedPlayers, setRotatedPlayers] = useState([]);
+    const [userPlayer, setUserPlayer] = useState(null);
+    const [currentPlayer, setCurrentPlayer] = useState(0);
     const navigate = useNavigate();
     const { user, logout } = useAuth();
 
@@ -24,7 +27,6 @@ const PokerTable = () => {
             const id = new URLSearchParams(window.location.search).get('gameId');
             if (id) {
                 setGameId(id);
-                console.log(gameId);
             }
         }
     }, [navigate]);
@@ -38,7 +40,7 @@ const PokerTable = () => {
                     gameData = JSON.parse(gameData.replace(/'/g, '"').replace(/\bTrue\b/g, 'true').replace(/\bFalse\b/g, 'false'));
                 }
                 setGame(gameData);
-                console.log(gameData);
+                console.log("Received updated game object:", gameData);
             });
 
             socket.on('redirect', (data) => {
@@ -54,6 +56,20 @@ const PokerTable = () => {
             };
         }
     }, [gameId, user]);
+
+    useEffect(() => {
+        // On game change, we need to make sure players are rotated around the table properly
+        if (game.round >= 0) {
+            const currentPlayerName = game.players[game.currentPlayer].user;
+            const nameList = game.players.map(player => player.user);
+            const userIndex = nameList.indexOf(user);
+            setRotatedPlayers(game.players.slice(userIndex).concat(game.players.slice(0, userIndex)));
+            const newNameList = rotatedPlayers.map(player => player.user);
+            setCurrentPlayer(newNameList.indexOf(currentPlayerName));
+            const uPlayer = rotatedPlayers[newNameList.indexOf(user)];
+            setUserPlayer(uPlayer);
+        }
+    }, [game]);
 
     const action = (data) => {
         socket.emit('action', { dataString: data }, { gameId });
@@ -72,26 +88,32 @@ const PokerTable = () => {
                 {user && <button onClick={logout}>Logout</button>}
                 {/* Poker table contents */}
             </div>
-            <UserCards user={game.players && game.players[0]} />
+            <UserCards user={userPlayer} />
             <TableInfo pot={game.pot} currentBet={game.currentBet} />
             <BetSlider />
-            <ActionContainer action={action} />
-            <PlayerSlots players={game.players} currentPlayer={game.currentPlayer} />
+            <ActionContainer pot={game.pot} user={user} game={game} action={action} />
+            <PlayerSlots players={rotatedPlayers} currentPlayer={currentPlayer} user = {user} />
             <TableCards cards={game} />
+            <ButtonGrid pot={game.pot} blind={game.bigBlind} user={user} game={game} />
+            <CurrentBets/>
         </div>
     );
 };
 
-const UserCards = ({ user }) => (
-    <div className="userCardContainer">
-        {user && (
-            <>
-                <img src={`../images/poker cards/${user.card1._num}_of_${user.card1._suit.toLowerCase()}.png`} alt="User Card 1" />
-                <img src={`../images/poker cards/${user.card2._num}_of_${user.card2._suit.toLowerCase()}.png`} alt="User Card 2" />
-            </>
-        )}
-    </div>
-);
+const UserCards = ({ user }) => {
+    return (
+        <div className="userCardContainer">
+            {user && (
+                <>
+                    <img className="userCard2" id="userCard2" alt="User Card 2" 
+                    src={`/images/poker cards/${user.card2._num}_of_${user.card2._suit.toLowerCase()}.png`} />
+                    <img className="userCard1" id="userCard1" alt="User Card 1"
+                    src={`/images/poker cards/${user.card1._num}_of_${user.card1._suit.toLowerCase()}.png`} />
+                </>
+            )}
+        </div>
+    );
+};
 
 const TableInfo = ({ pot, currentBet }) => (
     <div className="tableInfoContainer">
@@ -100,56 +122,161 @@ const TableInfo = ({ pot, currentBet }) => (
     </div>
 );
 
-const BetSlider = () => (
-    <div className="custom-slider-container">
-        <input type="range" min="0" max="1000" defaultValue="50" id="rV" />
-        <button className="actionButton" onClick={() => {/* handle custom bet */}}>
-            <span><p id="rangeValue">50</p></span>
-        </button>
-    </div>
-);
-
-const ActionContainer = ({ action }) => (
-    <div className="actionContainer">
-        <div className="buttonContainer" id="player00">
-            <button className="actionButton" onClick={() => action('FOLD')}><span>FOLD</span></button>
-            <button className="actionButton" onClick={() => action('CALL')}><span id="checkCall">CALL</span></button>
-            <button className="actionButton" onClick={() => {/* showBetSlider */}}><span>BET</span></button>
+const CurrentBets = () => {
+    return (
+        <div className="betsContainer">
+            {Array.from({ length: 9 }, (_, index) => (
+                <div className='playerCurrentBet' id={`player${index}`} key={index}>
+                    <img src='/images/general/chipWhite.png'/>
+                </div>
+            ))}
         </div>
-    </div>
-);
+    );
+};
 
-const PlayerSlots = ({ players, currentPlayer }) => (
+const BetSlider = () => {
+    const [sliderValue, setSliderValue] = useState(50);
+
+    const handleSliderChange = (event) => {
+        setSliderValue(event.target.value);
+    };
+
+    return (
+        <div className="custom-slider-container">
+            <input
+                type="range"
+                min="0"
+                max="1000"
+                value={sliderValue}
+                onChange={handleSliderChange}
+                className="custom-slider"
+                id="rV"
+            />
+            <button className="actionButton" id="customBets" onClick={() => {/* handle custom bet */}}>
+                <span><p id="rangeValue">{sliderValue}</p></span>
+            </button>
+        </div>
+    );
+};
+
+const ButtonGrid = ({ pot, blind, user, game }) => {
+    const buttons = [
+        { id: "blind", label: blind },
+        { id: "2blind", label: blind*2.5 },
+        { id: "pot", label: blind*5 },
+        { id: "allin", label: "ALL-IN"},
+    ];
+
+    function isUserTurn() {
+        if (user === game.players[game.currentPlayer].user) {
+            return {
+                animation: "expandButtons 2s infinite",
+            };
+        } else {
+            return {
+                animation: "None",
+            };
+        }
+    }
+
+    return (
+        pot && (
+            <div className="valueButtons" style={isUserTurn()}>
+                {buttons.map(button => (
+                    <button 
+                        key={button.id} 
+                        className="valueButton"
+                    >
+                        <span>{button.label}</span>
+                    </button>
+                ))}
+            </div>
+        )
+    );
+};
+
+const ActionContainer = ({ user, game, action }) => {
+
+    function isUserTurn() {
+        console.log(game);
+        if (game.players && user === game.players[game.currentPlayer].user) {
+            return {
+                animation: "expandButtons 2s infinite",
+            };
+        } else {
+            return {
+                animation: "None",
+            };
+        }
+    }
+
+    return (
+        <div className="actionContainer">
+            <div className="buttonContainer" id="player00" style={isUserTurn()}>
+                <button className="actionButton" onClick={() => action('FOLD')}><span>FOLD</span></button>
+                <button className="actionButton" onClick={() => action('CALL')}><span id="checkCall">CALL</span></button>
+            </div>
+        </div>
+    );
+};
+
+const PlayerSlots = ({ players, currentPlayer, user }) => {
+    function isActive(index) {
+        if (index === currentPlayer) {
+            return {
+                backgroundColor: "rgba(255, 255, 255, 1)",
+                animation: "expandButtons 2s infinite",
+                color: "black",
+            };
+        } else {
+            return {
+                backgroundColor: "rgba(0, 0, 0, 1)",
+                animation: "none",
+                color: "white",
+            };
+        }
+    }
+
+    function isUser(player) {
+        if (player !== user) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    return (
     <div className="playerContainer">
         {players && players.map((player, index) => (
-            <div className="playerSlot" id={`player${index}`} key={index}>
+            <div className="playerSlot" id={`player${index}`} key={index} style={isActive(index)}>
                 <div className="playerName" id={`player${index}Name`}>{player.user}</div>
-                <img src="images/general/yuhfar.png" className="profilePicture" alt="Profile" />
+                <img src="/images/general/yuhfar.png" className="profilePicture" alt="Profile" />
                 <div className="playerChipCount" id={`player${index}ChipCount`}>{player.chipCount} chips</div>
-                {player.card1 && player.card2 && (
+                {player.card1 && player.card2 && isUser(player.user) && (
                     <div className="playerCardContainer" style={{ top: '3vh', left: '5vw' }}>
-                        <img src={`./images/poker cards/${player.card1._num}_of_${player.card1._suit}.png`} 
+                        <img src={`/images/poker cards/${player.card1._num}_of_${player.card1._suit}.png`} 
                         className="playerCard1" id={`p${index}c1`} alt=""/>
-                        <img src={`./images/poker cards/${player.card2._num}_of_${player.card2._suit}.png`} 
+                        <img src={`/images/poker cards/${player.card2._num}_of_${player.card2._suit}.png`} 
                         className="playerCard2" id={`p${index}c2`} alt=""/>
                     </div>
                 )}
             </div>
         ))}
     </div>
-);
+    );
+}
 
 const TableCards = ({ cards }) => (
     <div className="tableCardsContainer">
-        {cards.flop1 && <img src={`../images/poker cards/${cards.flop1._num}_of_${cards.flop1._suit}.png`} 
+        {cards.flop1 && <img src={`/images/poker cards/${cards.flop1._num}_of_${cards.flop1._suit}.png`} 
         className="tableCard" id="flop1" alt=""/>}
-        {cards.flop2 && <img src={`../images/poker cards/${cards.flop2._num}_of_${cards.flop2._suit}.png`} 
+        {cards.flop2 && <img src={`/images/poker cards/${cards.flop2._num}_of_${cards.flop2._suit}.png`} 
         className="tableCard" id="flop2" alt=""/>}
-        {cards.flop3 && <img src={`../images/poker cards/${cards.flop3._num}_of_${cards.flop3._suit}.png`} 
+        {cards.flop3 && <img src={`/images/poker cards/${cards.flop3._num}_of_${cards.flop3._suit}.png`} 
         className="tableCard" id="flop3" alt=""/>}
-        {cards.turn && <img src={`../images/poker cards/${cards.turn._num}_of_${cards.turn._suit}.png`} 
+        {cards.turn && <img src={`/images/poker cards/${cards.turn._num}_of_${cards.turn._suit}.png`} 
         className="tableCard" id="turn" alt=""/>}
-        {cards.river && <img src={`../images/poker cards/${cards.river._num}_of_${cards.river._suit}.png`} 
+        {cards.river && <img src={`/images/poker cards/${cards.river._num}_of_${cards.river._suit}.png`} 
         className="tableCard" id="river" alt=""/>}
     </div>
 );
