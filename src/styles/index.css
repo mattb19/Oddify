@@ -1,0 +1,55 @@
+body {
+    font-family: "Tahoma", sans-serif;
+    background-color: #f4f4f4; /* Optional: a light background color */
+}
+
+.blackjack-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centering the content */
+}
+
+h1 {
+    color: #000000; /* Optional: heading color */
+}
+.tally {
+    margin-top: 20px;
+    font-size: 1.2em;
+  }
+  .blackjack-container {
+    display: flex;
+    justify-content: center;  /* Centers the content horizontally */
+    align-items: center;      /* Centers the content vertically */
+    height: 100vh;           /* Full height of the viewport */
+  }
+  
+  .blackjack-table {
+    border: 2px solid #ffffff;  /* Optional: add a border around the table */
+    padding: 20px;           /* Optional: add some padding */
+    border-radius: 10px;     /* Optional: rounded corners */
+    background-color: #f9f9f9; /* Optional: background color */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: shadow effect */
+  }
+  /* index.css or the relevant CSS file */
+.App {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center horizontally */
+    justify-content: center; /* Center vertically */
+    min-height: 100vh; /* Ensure it takes up the full viewport height */
+    background-color: #332525; /* Optional: background color */
+  }
+  
+  .blackjack-table {
+    border: 2px solid #333; /* Optional: border for the table */
+    border-radius: 10px; /* Optional: rounded corners */
+    padding: 20px; /* Optional: padding inside the table */
+    background-color: white; /* Optional: background color for the table */
+    width: 80%; /* Optional: set a width */
+    max-width: 600px; /* Optional: set a max-width */
+  }
+  
+  h1 {
+    text-align: center; /* Center the heading */
+  }
+  
