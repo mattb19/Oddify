@@ -55,24 +55,15 @@ body, html {
     top: 50vh;
     width: 800vmin;
     height: 800vmin;
-    background: conic-gradient(
+    background-color: rgb(255, 255, 255);
+    /* background: conic-gradient(
         from 0deg,
         rgb(81, 114, 81) 0deg, 
         rgb(199, 199, 199) 180deg, 
         rgb(81, 114, 81) 181deg,
         rgb(199, 199, 199) 360deg
-    );
+    ); */
     border-radius: 50%;
-    animation: spin 5s linear infinite;
-}
-
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
 }
 
 
@@ -124,19 +115,34 @@ body, html {
     width: 6vw;
     height: auto;
 }
-.playerCard1 {
+.playerCard1L {
     position: absolute;
     width: 45%;
     height: auto;
     left: 0vw;
     transform: rotate(-10deg);
 }
-.playerCard2 {
+.playerCard1R {
+    position: absolute;
+    width: 45%;
+    height: auto;
+    left: -6.8vw;
+    transform: rotate(10deg);
+}
+.playerCard2L {
     position: absolute;
     width: 45%;
     height: auto;
     left: 2vw;
     transform: rotate(10deg);
+}
+.playerCard2R {
+    position: absolute;
+    width: 45%;
+    height: auto;
+    left: -8.8vw;
+    transform: rotate(-10deg);
+    z-index: -1;
 }
 
 @keyframes fold1 {
@@ -173,15 +179,15 @@ body, html {
     }
 }
 
-#player0 { top: 79vh; left: 50vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
-#player1 { top: 68vh; left: 20vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
-#player2 { top: 45vh; left: 15.5vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
-#player3 { top: 22vh; left: 20vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
-#player4 { top: 10vh; left: 40vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
-#player5 { top: 10vh; left: 60vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
-#player6 { top: 22vh; left: 80vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
-#player7 { top: 45vh; left: 84.5vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
-#player8 { top: 68vh; left: 80vw; transform: translate(-50%, -50%); } /* Moved from 48% to 54% */
+#player0 { top: 79vh; left: 50vw; transform: translate(-50%, -50%); } 
+#player1 { top: 68vh; left: 20vw; transform: translate(-50%, -50%); } 
+#player2 { top: 45vh; left: 15.5vw; transform: translate(-50%, -50%); } 
+#player3 { top: 22vh; left: 20vw; transform: translate(-50%, -50%); } 
+#player4 { top: 10vh; left: 40vw; transform: translate(-50%, -50%); } 
+#player5 { top: 10vh; left: 60vw; transform: translate(-50%, -50%); } 
+#player6 { top: 22vh; left: 80vw; transform: translate(-50%, -50%); } 
+#player7 { top: 45vh; left: 84.5vw; transform: translate(-50%, -50%); } 
+#player8 { top: 68vh; left: 80vw; transform: translate(-50%, -50%); } 
 
 
 
@@ -197,20 +203,16 @@ body, html {
     color: white; /* Text color */
     text-align: center; /* Center the text */
     position: absolute;
-    top: 50vh;
+    top: 49vh;
     left: 50vw;
     transform: translate(-50%, -50%); /* Centering */
 }
 
 .pot {
-    font-size: 1.7vw; /* Adjust font size as needed */
-}
-
-.currentBet {
     background-color: rgba(0, 0, 0, 0.3); /* Optional background for visibility */
     padding: 0.2vw; /* Padding for some spacing */
     border-radius: 0.4vw; /* Rounded corners */
-    font-size: 0.7vw; /* Adjust font size as needed */
+    font-size: 1.2vw; /* Adjust font size as needed */
 }
 
 
@@ -559,10 +561,68 @@ body, html {
 
 
 /************* Current Bet Markers *************/
-.betsContainer {
-
-}
-
 .playerCurrentBet {
-
+    z-index: 100000;
+    position: absolute;
+    left: 50vw; /* Center horizontally based on viewport width */
+    background-color: rgba(0, 0, 0, 0.3);
+    color: white;
+    display: flex; 
+    align-items: center; /* Center items vertically */
+    height: 3vh; /* Set height for the container */
+    width: auto; /* Set width for the container */
+    border-radius: 5vw;
 }
+
+.pokerChip {
+    height: 125%; /* Match the height of the parent container */
+    position: relative;
+    right: 0.2vw;
+    width: auto; /* Adjust width automatically */
+    margin-right: -0.3vw; /* Space between the chip and bet amount */
+}
+
+.betAmount {
+    font-size: 1vw; /* Adjust font size as needed */
+    padding-bottom: 0.2vh;
+    padding-right: 0.4vw;
+}
+
+
+#playerBet0 { top: 69vh; left: 57.6vw; transform: translate(-50%, -50%); } 
+#playerBet1 { top: 71vh; left: 29vw; transform: translate(-50%, -50%); } 
+#playerBet2 { top: 48vh; left: 24.5vw; transform: translate(-50%, -50%); } 
+#playerBet3 { top: 25vh; left: 29vw; transform: translate(-50%, -50%); } 
+#playerBet4 { top: 26vh; left: 40vw; transform: translate(-50%, -50%); } 
+#playerBet5 { top: 26vh; left: 60vw; transform: translate(-50%, -50%); } 
+#playerBet6 { top: 25vh; left: 71vw; transform: translate(-50%, -50%); } 
+#playerBet7 { top: 48vh; left: 75.5vw; transform: translate(-50%, -50%); } 
+#playerBet8 { top: 71vh; left: 71vw; transform: translate(-50%, -50%); } 
+
+
+
+
+
+
+
+/************* Blind Markers *************/
+.blindContainer {
+    z-index: 100000;
+    position: absolute;
+    left: 50vw;
+}
+
+.blind {
+    height: auto;
+    width: 3vw;
+}
+
+#blind0 { top: 69vh; left: 43vw; transform: translate(-50%, -50%); } 
+#blind1 { top: 66vh; left: 29vw; transform: translate(-50%, -50%); } 
+#blind2 { top: 43vh; left: 24.5vw; transform: translate(-50%, -50%); } 
+#blind3 { top: 20vh; left: 29vw; transform: translate(-50%, -50%); } 
+#blind4 { top: 21vh; left: 40vw; transform: translate(-50%, -50%); } 
+#blind5 { top: 21vh; left: 60vw; transform: translate(-50%, -50%); } 
+#blind6 { top: 20vh; left: 71vw; transform: translate(-50%, -50%); } 
+#blind7 { top: 43vh; left: 75.5vw; transform: translate(-50%, -50%); } 
+#blind8 { top: 66vh; left: 71vw; transform: translate(-50%, -50%); } 

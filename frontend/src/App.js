@@ -18,7 +18,7 @@ const App = () => {
                 <Routes>
                     <Route path="/poker" element={<ProtectedRoute element={<PokerTable />} />} />
                     <Route path="/login" element={<Login />} /> 
-                    <Route path="/home" element={<Home />} /> 
+                    <Route path="/home" element={<Home />} />             
                     {/* Other routes can be added here */}
                 </Routes>
             </Router>

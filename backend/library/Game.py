@@ -118,6 +118,7 @@ class Game:
 
         # Initialize or rotate blinds
         if not self.active:
+            self.players[-1].setBlind(3)
             self.players[0].setBlind(1)
             self.players[1].setBlind(2)
             self.active = True

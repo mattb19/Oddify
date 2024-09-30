@@ -89,13 +89,15 @@ const PokerTable = () => {
                 {/* Poker table contents */}
             </div>
             <UserCards user={userPlayer} />
-            <TableInfo pot={game.pot} currentBet={game.currentBet} />
+            <TableInfo pot={game.pot} players={rotatedPlayers} />
             <BetSlider />
             <ActionContainer pot={game.pot} user={user} game={game} action={action} />
             <PlayerSlots players={rotatedPlayers} currentPlayer={currentPlayer} user = {user} />
             <TableCards cards={game} />
             <ButtonGrid pot={game.pot} blind={game.bigBlind} user={user} game={game} />
             <CurrentBets/>
+            <BlindChips players={rotatedPlayers}/>
+
         </div>
     );
 };
@@ -115,21 +117,24 @@ const UserCards = ({ user }) => {
     );
 };
 
-const TableInfo = ({ pot, currentBet }) => (
+const TableInfo = ({ pot }) => (
     <div className="tableInfoContainer">
-        <div className="pot" id="potAmount">{pot}</div>
-        <div className="currentBet" id="currentBetAmount">Current Bet: {currentBet}</div>
+        <div className="pot" id="potAmount">Pot: {pot}</div>
     </div>
 );
 
-const CurrentBets = () => {
+const CurrentBets = ({ players = [] }) => {
     return (
         <div className="betsContainer">
-            {Array.from({ length: 9 }, (_, index) => (
-                <div className='playerCurrentBet' id={`player${index}`} key={index}>
-                    <img src='/images/general/chipWhite.png'/>
-                </div>
-            ))}
+            {Array.from({ length: 9 }, (_, index) => {
+                const player = players[index]; // Get the player at this index
+                return (
+                    <div className='playerCurrentBet' id={`playerBet${index}`} key={index}>
+                        <img src='/images/general/chipWhite.png' alt={`Player ${index} chip`} className='pokerChip'/>
+                        <span className='betAmount'>200</span>
+                    </div>
+                );
+            })}
         </div>
     );
 };
@@ -255,9 +260,9 @@ const PlayerSlots = ({ players, currentPlayer, user }) => {
                 {player.card1 && player.card2 && isUser(player.user) && (
                     <div className="playerCardContainer" style={{ top: '3vh', left: '5vw' }}>
                         <img src={`/images/poker cards/${player.card1._num}_of_${player.card1._suit}.png`} 
-                        className="playerCard1" id={`p${index}c1`} alt=""/>
+                        className={index < 5 ? "playerCard1L" : "playerCard1R"} id={`p${index}c1`} alt=""/>
                         <img src={`/images/poker cards/${player.card2._num}_of_${player.card2._suit}.png`} 
-                        className="playerCard2" id={`p${index}c2`} alt=""/>
+                        className={index < 5 ? "playerCard2L" : "playerCard2R"} id={`p${index}c2`} alt=""/>
                     </div>
                 )}
             </div>
@@ -280,5 +285,31 @@ const TableCards = ({ cards }) => (
         className="tableCard" id="river" alt=""/>}
     </div>
 );
+
+const BlindChips = ({ players }) => {
+    return (
+        <div className="betsContainer">
+            {Array.from({ length: 9 }, (_, index) => {
+                // Determine the correct image based on player.blind value or dealer index
+                let chipImage = '';
+
+                if (players[index]?.blind === 2) {
+                    chipImage = '/images/general/bigBlind.png';
+                } else if (players[index]?.blind === 1) {
+                    chipImage = '/images/general/smallBlind.png';
+                } else {
+                    chipImage = '/images/general/smallBlind.png'; // Default image
+                }
+
+                return (
+                    <div className='blindContainer' id={`blind${index}`} key={index}>
+                        {chipImage && <img src={chipImage} className='blind'/>}
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
+
 
 export default PokerTable;
